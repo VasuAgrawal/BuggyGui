@@ -1,8 +1,8 @@
 """Authenticate a Tornado IO stream to receive a buggy's data run."""
 
+import logging
 from protos.auth_pb2 import AuthMessage
 from packet import Packet
-import logging
 
 valid_keys = set(["42"])
 current_keys = set()

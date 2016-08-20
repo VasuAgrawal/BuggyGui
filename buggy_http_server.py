@@ -1,20 +1,21 @@
 import os
+import logging
 import tornado
 import tornado.web
 import tornado.websocket
 import tornado.httpserver
-import logging
 
-from protos.message_pb2 import DataMessage
 
 class RootHandler(tornado.web.RequestHandler):
+
     def get(self):
-        # self.write("Hello, world!")
         self.render("static/index.html")
 
 clients = []
 
+
 class BaseWsHandler(tornado.websocket.WebSocketHandler):
+
     def open(self):
         logging.info("Websocket opened!")
         clients.append(self)
@@ -28,32 +29,27 @@ class BaseWsHandler(tornado.websocket.WebSocketHandler):
             clients.remove(self)
 
 
-def _get_settings():
-    return {
-            "static_path": os.path.join(os.path.dirname(__file__), "static"),
-            }
-
 def _make_app():
+    settings = {
+        "static_path": os.path.join(os.path.dirname(__file__), "static"),
+    }
+
     return tornado.web.Application([
         (r"/", RootHandler),
         (r"/ws", BaseWsHandler),
         # Serve the proto files we need, and only those ending in .proto
-        (r"/protos/(.*proto$)", tornado.web.StaticFileHandler, {'path':
-            os.path.join(os.path.dirname(__file__), "protos")})
-    ], **_get_settings())
+        (r"/protos/(.*proto$)", tornado.web.StaticFileHandler,
+         {'path': os.path.join(os.path.dirname(__file__), "protos")})
+    ], **settings)
+
 
 @tornado.gen.coroutine
 def queue_test():
-    while(True):
+    while True:
         data_message = yield data_queue.get()
-        # data = DataMessage()
-        # data.ParseFromString(data_message)
-        # logging.info(data)
-
-        # logging.info("Received data: %s", out)
         for i, wsclient in enumerate(clients):
             logging.info("Sending data to client %d", i)
-            yield wsclient.write_message(data_message, binary = True)
+            yield wsclient.write_message(data_message, binary=True)
 
 
 def BuggyHttpServer(q):

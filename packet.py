@@ -1,15 +1,16 @@
 class Packet(object):
-    HEADER = "Herpaderp".encode("utf-8")
-    FOOTER = "VasuIsGreat\n".encode("utf-8")
+    # Python3 supports unicode strings, these could be emojis if I suppose ...
+    HEADER = "42".encode("utf-8")
+    FOOTER = "How many paths must a man walk?".encode("utf-8")
 
-    @staticmethod 
+    @staticmethod
     def make_packet_from_string(data):
-        assert(isinstance(data, str))
+        assert isinstance(data, str)
         return Packet.make_packet_from_bytes(data.encode("utf-8"))
 
     @staticmethod
     def make_packet_from_bytes(data):
-        assert(isinstance(data, bytes))
+        assert isinstance(data, bytes)
         return Packet.HEADER + data + Packet.FOOTER
 
     @staticmethod

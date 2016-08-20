@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+// TODO(vasua): Add timestamps and see if there's some form of inheritance.
+
 message ImuMessage {
     double roll = 1;
     double pitch = 2;
@@ -9,6 +11,16 @@ message ImuMessage {
 message GpsMessage {
     double lat = 1;
     double long = 2;
+}
+
+message EncoderMessage {
+    double position = 1;
+    double velocity = 2;
+    double acceleration = 3;
+}
+
+message WheelAngleCommandedMessage {
+    double angle = 1;
 }
 
 message DataMessage {

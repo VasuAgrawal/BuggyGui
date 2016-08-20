@@ -1,12 +1,13 @@
 window.onload = read();
 
 function onImuMessage(message) {
-    console.log(message.roll);
-    console.log(message.pitch);
-    console.log(message.yaw);
+    console.log("Received imu message!");
+    console.log(message);
 }
 
 function onGpsMessage(message) {
+    console.log("Received GPS message!");
+    console.log(message);
 }
 
 function read() {
