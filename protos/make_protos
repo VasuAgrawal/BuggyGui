@@ -1,0 +1,1 @@
+protoc --python_out=. auth.proto message.proto

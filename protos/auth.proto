@@ -1,0 +1,7 @@
+syntax = "proto3";
+
+message AuthMessage {
+    string secret_key = 1;    
+    string team_name = 2;
+    string buggy_name = 3;
+}

@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+message ImuMessage {
+    double roll = 1;
+    double pitch = 2;
+    double yaw = 3;
+}
+
+message GpsMessage {
+    double lat = 1;
+    double long = 2;
+}
+
+message DataMessage {
+    oneof data {
+        ImuMessage imu = 1;
+        GpsMessage gps = 2;
+    }
+}
