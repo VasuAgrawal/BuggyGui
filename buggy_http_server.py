@@ -46,7 +46,7 @@ def _make_app():
         # Serve the proto files we need, and only those ending in .proto
         (r"/protos/(.*proto$)", tornado.web.StaticFileHandler,
          {'path': os.path.join(os.path.dirname(__file__), "protos")})
-    ], debug = False, **settings)
+    ], debug = True, **settings)
 
 
 @tornado.gen.coroutine

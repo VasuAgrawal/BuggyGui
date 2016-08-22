@@ -7,11 +7,26 @@ function initializeScatter(divId) {
     registerPlot(plot);
 }
 
+function initializeStatus(divId) {
+    var card = makeCardDiv(divId, colCount = 4);
+    card.className = "mdl-card";
+
+    title = document.createElement("div");
+    title.className = "mdl-card__title";
+    titleText = document.createElement("h2");
+    titleText.className = "mdl-card__title-text";
+    titleText.innerHTML = "Robobuggy Statuses";
+    title.appendChild(titleText);
+    card.appendChild(title);
+
+}
+
 function initializeWidgets() {
     initializeScatter("graph1");
     initializeScatter("graph2");
     initializeScatter("graph3");
     initializeScatter("graph4");
+    initializeStatus("statuses");
 }
 
 function onImuMessage(message) {
@@ -28,12 +43,31 @@ function onImuMessage(message) {
     Plotly.extendTraces(plot, {x: [[time]], y: [[message.yaw]]}, [0], 100);
 }
 
+// At some point this will need to call the Google maps api and deploy points
+// that way.
 function onGpsMessage(message) {
     //console.log("Received GPS message!");
     //console.log(message);
     var plot = document.getElementById("graph4").childNodes[0];
     var time = message.time.seconds.low + (message.time.nanos / 10e9);
     Plotly.extendTraces(plot, {x: [[time]], y: [[message.lat]]}, [0], 10);
+}
+
+function onStatusMessage(message) {
+    // This is probably a bad idea?
+    if (!this.messages) {
+        this.messages = [];
+    }
+
+    while(this.messages.length > 10) {
+        this.messages.shift();
+    }
+
+    this.messages.push(message.text);
+    //console.log(this.messages); 
+    var statusBox= document.getElementById("textbox");
+    statusBox.innerHTML = this.messages.join("\n\n");
+    statusBox.scrollTop = statusBox.scrollHeight;
 }
 
 function fetchDataFromServer() {
@@ -68,6 +102,12 @@ function fetchDataFromServer() {
             break;
         case "gps":
             onGpsMessage(message);
+            break;
+        case "status":
+            onStatusMessage(message);
+            break;
+        default:
+            console.log(message);
             break;
         }
     }
