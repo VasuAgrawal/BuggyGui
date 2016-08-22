@@ -1,31 +1,37 @@
 syntax = "proto3";
 
-// TODO(vasua): Add timestamps and see if there's some form of inheritance.
+import "google/protobuf/timestamp.proto";
 
 message ImuMessage {
-    double roll = 1;
-    double pitch = 2;
-    double yaw = 3;
+    google.protobuf.Timestamp time = 1;
+    double roll = 2;
+    double pitch = 3;
+    double yaw = 4;
 }
 
 message GpsMessage {
-    double lat = 1;
-    double long = 2;
+    google.protobuf.Timestamp time = 1;
+    double lat = 2;
+    double long = 3;
 }
 
 message EncoderMessage {
-    double position = 1;
-    double velocity = 2;
-    double acceleration = 3;
+    google.protobuf.Timestamp time = 1;
+    double position = 2;
+    double velocity = 3;
+    double acceleration = 4;
 }
 
 message WheelAngleCommandedMessage {
-    double angle = 1;
+    google.protobuf.Timestamp time = 1;
+    double angle = 2;
 }
 
 message DataMessage {
     oneof data {
         ImuMessage imu = 1;
         GpsMessage gps = 2;
+        EncoderMessage enc = 3;
+        WheelAngleCommandedMessage command = 4;
     }
 }

@@ -1,21 +1,50 @@
-window.onload = read();
+window.onload = fetchDataFromServer();
+
+function initializeScatter(divId) {
+    var plot = makeCardDiv(divId, colCount = 6, height = "400px");
+    var data = [{x: [], y: [], type: 'scatter'}];
+    Plotly.plot(plot, data);
+    registerPlot(plot);
+}
+
+function initializeWidgets() {
+    initializeScatter("graph1");
+    initializeScatter("graph2");
+    initializeScatter("graph3");
+    initializeScatter("graph4");
+}
 
 function onImuMessage(message) {
-    console.log("Received imu message!");
-    console.log(message);
+    //console.log("Received imu message!");
+    //console.log(message);
+    var plot = document.getElementById("graph1").childNodes[0];
+    var time = message.time.seconds.low + (message.time.nanos / 10e9);
+    Plotly.extendTraces(plot, {x: [[time]], y: [[message.roll]]}, [0], 100);
+    
+    var plot = document.getElementById("graph2").childNodes[0];
+    Plotly.extendTraces(plot, {x: [[time]], y: [[message.pitch]]}, [0], 100);
+    
+    var plot = document.getElementById("graph3").childNodes[0];
+    Plotly.extendTraces(plot, {x: [[time]], y: [[message.yaw]]}, [0], 100);
 }
 
 function onGpsMessage(message) {
-    console.log("Received GPS message!");
-    console.log(message);
+    //console.log("Received GPS message!");
+    //console.log(message);
+    var plot = document.getElementById("graph4").childNodes[0];
+    var time = message.time.seconds.low + (message.time.nanos / 10e9);
+    Plotly.extendTraces(plot, {x: [[time]], y: [[message.lat]]}, [0], 10);
 }
 
-function read() {
-    var ProtoBuf = dcodeIO.ProtoBuf;
-    // Make it a binary websocket since we're getting all protobufs
+function fetchDataFromServer() {
+    initializeWidgets();
+    // Make it a binary websocket since we're getting all protobufs. This should
+    // be fairly efficient.
     var testSocket = new ReconnectingWebSocket("ws://" + location.host + "/ws",
             null, {binaryType: "arraybuffer"});
-    var builder = ProtoBuf.loadProtoFile(location.origin + 
+
+    // Figure out how to asynchronously load the proto.
+    var builder = dcodeIO.ProtoBuf.loadProtoFile(location.origin + 
             "/protos/message.proto");
     var DataMessage = builder.build("DataMessage");
 

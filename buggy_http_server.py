@@ -11,6 +11,11 @@ class RootHandler(tornado.web.RequestHandler):
     def get(self):
         self.render("static/index.html")
 
+class MdlHandler(tornado.web.RequestHandler):
+
+    def get(self):
+        self.render("static/mdl.html")
+
 clients = []
 
 
@@ -36,11 +41,12 @@ def _make_app():
 
     return tornado.web.Application([
         (r"/", RootHandler),
+        (r"/mdl", MdlHandler),
         (r"/ws", BaseWsHandler),
         # Serve the proto files we need, and only those ending in .proto
         (r"/protos/(.*proto$)", tornado.web.StaticFileHandler,
          {'path': os.path.join(os.path.dirname(__file__), "protos")})
-    ], **settings)
+    ], debug = False, **settings)
 
 
 @tornado.gen.coroutine
