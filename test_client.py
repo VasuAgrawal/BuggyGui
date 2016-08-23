@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import logging
 from protos.auth_pb2 import AuthMessage
 from protos.message_pb2 import DataMessage
