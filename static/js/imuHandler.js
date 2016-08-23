@@ -16,4 +16,4 @@ function onImuMessage(message) {
     Plotly.extendTraces(plot, {x: [[time]], y: [[message.yaw]]}, [0], 100);
 }
 
-registerCallback("IMU", onImuMessage);
+MessageMaster.registerCallback("IMU", onImuMessage);

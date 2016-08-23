@@ -5,5 +5,5 @@ function fetchDataFromServer() {
             null, {binaryType: "arraybuffer"});
     dataSocket.onopen = function() { console.log("Yay, I opened a socket!"); }
     dataSocket.onclose = function() { console.log("Oh no the socket closed."); }
-    dataSocket.onmessage = handleMessage;
+    dataSocket.onmessage = MessageMaster.handleMessage;
 }

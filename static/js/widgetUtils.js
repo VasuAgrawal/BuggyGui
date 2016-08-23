@@ -17,7 +17,7 @@
 function makeCard(divId, colCount = 8) {
     var elem = document.getElementById(divId);
     if (elem) {
-        elem.className = "mdl-cell mdl-cell--" + colCount + "-col mdl-shadow--2dp";
+        elem.className = "mdl-color--primary mdl-cell mdl-cell--" + colCount + "-col mdl-shadow--2dp";
         componentHandler.upgradeElement(elem);
         return elem;
     } else {

@@ -23,7 +23,7 @@
                 </div>
             </header>
 
-            <main class="mdl-layout__content">
+            <main class="mdl-layout__content mdl-color--grey-100">
                 <div class="page-content">
                     <!-- Your content goes here -->
                     <div class="mdl-grid">
@@ -33,8 +33,10 @@
                         <div id="graph3"></div>
                         <div id="graph4"></div>
 
+                        <div id="testGraph"></div>
+
                         <div class="mdl-cell mdl-cell--12-col mdl-shadow--2dp">
-                            <div class="mdl-card" style="width:100%;height: 400px;">
+                            <div class="mdl-card mdl-color--primary" style="width:100%;height: 400px;">
                                 <div class="mdl-card__title">
                                     <h2 class="mdl-card__title-text">
                                         Statuses
@@ -56,19 +58,19 @@
                                 <div class="mdl-card__actions"
                                      style="height: 20%; padding: 16px;">
                                     <button class="mdl-button mdl-js-button
-                                        mdl-button--colored
+                                        mdl-button--accent
                                         mdl-button--raised
                                         mdl-js-ripple-effect">
                                         Info
                                     </button>
                                     <button class="mdl-button mdl-js-button
-                                        mdl-button--colored
+                                        mdl-button--accent
                                         mdl-button--raised
                                         mdl-js-ripple-effect">
                                         Warning
                                     </button>
                                     <button class="mdl-button mdl-js-button
-                                        mdl-button--colored
+                                        mdl-button--accent
                                         mdl-button--raised
                                         mdl-js-ripple-effect">
                                         Error
@@ -78,6 +80,8 @@
                         </div>
 
                     </div>
+
+
                 </div>
             </main>
         </div>
@@ -94,6 +98,7 @@
         <script src="{{ static_url("js/imuHandler.js")}}"></script>
         <script src="{{ static_url("js/statusHandler.js")}}"></script>
         <script src="{{ static_url("js/gpsHandler.js")}}"></script>
+        <script src="{{ static_url("js/encoderHandler.js")}}"></script>
 
         <script src="{{ static_url("js/third_party/reconnecting-websocket.js")}}"></script>
         <script src="{{ static_url("js/ws.js")}}"></script>

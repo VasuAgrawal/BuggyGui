@@ -29,4 +29,4 @@ function onStatusMessage(message) {
 }
 
 initializeStatus("statuses");
-registerCallback("STATUS", onStatusMessage);
+MessageMaster.registerCallback("STATUS", onStatusMessage);

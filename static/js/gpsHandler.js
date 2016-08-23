@@ -8,4 +8,4 @@ function onGpsMessage(message) {
     Plotly.extendTraces(plot, {x: [[time]], y: [[message.lat]]}, [0], 10);
 }
 
-registerCallback("GPS", onGpsMessage);
+MessageMaster.registerCallback("GPS", onGpsMessage);
