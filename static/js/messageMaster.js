@@ -28,9 +28,6 @@ MessageMaster.handleMessage = function(event) {
     var message = dataMessage.get(dataMessage.data);
     var dataType = dataMessage.data_type;
 
-    console.log(MessageMaster.callbacks);
-    //debugger;
-
     for (var fn of MessageMaster.callbacks[dataType]) {
         fn(message);
     }

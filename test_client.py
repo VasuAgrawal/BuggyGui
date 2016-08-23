@@ -100,9 +100,9 @@ client = Client()
 tornado.ioloop.PeriodicCallback(client.make_connection, 1000).start()
 # Periodically send various types of messages
 tornado.ioloop.PeriodicCallback(client.async_send_stream(
-    client.make_status_data), 50).start()
+    client.make_status_data), 5).start()
 tornado.ioloop.PeriodicCallback(client.async_send_stream(
-    client.make_imu_data), 500).start()
+    client.make_imu_data), 5).start()
 tornado.ioloop.PeriodicCallback(client.async_send_stream(
     client.make_gps_data), 1000).start()
 

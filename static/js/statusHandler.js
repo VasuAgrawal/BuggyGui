@@ -28,5 +28,5 @@ function onStatusMessage(message) {
     statusBox.scrollTop = statusBox.scrollHeight;
 }
 
-initializeStatus("statuses");
+//initializeStatus("statuses");
 MessageMaster.registerCallback("STATUS", onStatusMessage);

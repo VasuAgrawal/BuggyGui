@@ -56,6 +56,6 @@ var layout = {
              showgrid: false, range: [-1, 1]}
 };
 
-var plot = makeCardDiv("testGraph", colCount = 6, height="400px");
-Plotly.newPlot(plot, data, layout);
-registerPlot(plot);
+//var plot = makeCardDiv("testGraph", colCount = 6, height="400px");
+//Plotly.newPlot(plot, data, layout);
+//registerPlot(plot);
