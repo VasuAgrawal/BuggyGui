@@ -34,6 +34,15 @@ message TextMessage {
 }
 
 message DataMessage {
+    enum DataType {
+        TEST = 0; // Ignore this message
+        IMU = 1;
+        GPS = 2;
+        ENCODER = 3;
+        COMMAND_ANGLE = 4;
+        ACTUAL_ANGLE = 5;
+        STATUS = 6;
+    }
     oneof data {
         ImuMessage imu = 1;
         GpsMessage gps = 2;
@@ -42,4 +51,5 @@ message DataMessage {
         WheelAngleCommandedMessage actual_angle = 5;
         TextMessage status = 6;
     }
+    DataType data_type = 7;
 }

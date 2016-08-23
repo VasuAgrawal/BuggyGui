@@ -64,3 +64,10 @@ function registerPlot(plot) {
     }
     window.onresize();
 }
+
+function initializeScatter(divId) {
+    var plot = makeCardDiv(divId, colCount = 6, height = "400px");
+    var data = [{x: [], y: [], type: 'scatter'}];
+    Plotly.plot(plot, data);
+    registerPlot(plot);
+}

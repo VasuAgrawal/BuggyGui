@@ -62,18 +62,21 @@ class Client(TCPClient):
         data.gps.lat = random.uniform(40.5, 41)
         data.gps.long = random.uniform(42, 42.5)
         self.make_timestamp(data.gps.time)
+        data.data_type = DataMessage.GPS
 
     def make_status_data(self, data):
         # Just generate some fake text to make my life interesting.
         data.status.text = " ".join(
             [random.choice(words).strip() for _ in range(10)])
         self.make_timestamp(data.status.time)
+        data.data_type = DataMessage.STATUS
 
     def make_imu_data(self, data):
         data.imu.roll = random.uniform(-1, 1)
         data.imu.pitch = random.uniform(-2, 2)
         data.imu.yaw = random.uniform(-3, 3)
         self.make_timestamp(data.imu.time)
+        data.data_type = DataMessage.IMU
 
     def async_send_stream(self, gen_fn):
         async def send():
@@ -100,5 +103,7 @@ tornado.ioloop.PeriodicCallback(client.async_send_stream(
     client.make_status_data), 50).start()
 tornado.ioloop.PeriodicCallback(client.async_send_stream(
     client.make_imu_data), 500).start()
+tornado.ioloop.PeriodicCallback(client.async_send_stream(
+    client.make_gps_data), 1000).start()
 
 tornado.ioloop.IOLoop.instance().start()
