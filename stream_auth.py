@@ -34,7 +34,7 @@ async def auth_stream(stream, address):
         return None
 
     # TODO(vasua): Better validation here.
-    if (auth_message.secret_key in valid_keys):
+    if auth_message.secret_key in valid_keys:
         # Eventually, we'll want to check that the team name is one of the teams
         # that is using the service, and that the buggy name is a valid one. The
         # auth key can probably be unique per team, or possibly some combination

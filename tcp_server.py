@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+"""Initializes data and http servers.
+
+Starts both the HTTP and Data servers, as well as the Tornado IO loop to get
+them both running.
+"""
 
 import logging
 import tornado

@@ -5,13 +5,14 @@ import tornado.web
 import tornado.websocket
 import tornado.httpserver
 
+clients = []
+data_queue = None
 
 class RootHandler(tornado.web.RequestHandler):
 
     def get(self):
         self.render("static/index.html")
 
-clients = []
 
 
 class BaseWsHandler(tornado.websocket.WebSocketHandler):
@@ -40,7 +41,7 @@ def _make_app():
         # Serve the proto files we need, and only those ending in .proto
         (r"/protos/(.*proto$)", tornado.web.StaticFileHandler,
          {'path': os.path.join(os.path.dirname(__file__), "protos")})
-    ], debug = True, **settings)
+    ], debug=True, **settings)
 
 
 @tornado.gen.coroutine
@@ -52,7 +53,8 @@ def queue_test():
             yield wsclient.write_message(data_message, binary=True)
 
 
-def BuggyHttpServer(q):
+# This is meant to look like a class definition
+def BuggyHttpServer(q): # pylint: disable=invalid-name
     global data_queue
     data_queue = q
     queue_test()
