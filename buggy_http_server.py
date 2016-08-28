@@ -48,8 +48,15 @@ def _make_app():
 def queue_test():
     while True:
         data_message = yield data_queue.get()
-        for i, wsclient in enumerate(clients):
-            yield wsclient.write_message(data_message, binary=True)
+        # clients_to_remove = []
+        for client in clients[::-1]:
+            try:
+                yield client.write_message(data_message, binary=True)
+            except:
+                clients.remove(client)
+                # clients_to_remove.append(client)
+        # for client in clients_to_remove:
+            # clients.remove(client)
 
 
 # This is meant to look like a class definition
