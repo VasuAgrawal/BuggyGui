@@ -68,7 +68,7 @@ class Client(TCPClient):
         # Just generate some fake text to make my life interesting.
         level = random.choice(["DEBUG", "WARNING", "INFO", "ERROR", "FATAL"])
         data.status.log_level = getattr(LogMessage, level)
-        data.status.text = ("[ %10s ] " % level) + " ".join(
+        data.status.text = " ".join(
             [random.choice(words).strip() for _ in range(10)])
         self.make_timestamp(data.status.time)
         data.data_type = DataMessage.STATUS
