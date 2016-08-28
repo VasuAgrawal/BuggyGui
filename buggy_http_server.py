@@ -49,7 +49,6 @@ def queue_test():
     while True:
         data_message = yield data_queue.get()
         for i, wsclient in enumerate(clients):
-            logging.info("Sending data to client %d", i)
             yield wsclient.write_message(data_message, binary=True)
 
 

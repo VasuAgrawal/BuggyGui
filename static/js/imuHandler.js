@@ -49,7 +49,8 @@ var imu1 = new AngleViewer("imu1", 1, 1, 1, "Top Right View");
 makeCard("imu2", colCount = 4);
 var imu2 = new AngleViewer("imu2", 1, 1, 0, "Top Front View");
 makeCard("imu3", colCount = 4);
-var imu3 = new AngleViewer("imu3", 0, 0, 1, "Side View");
+imu3 = new AngleViewer("imu3", 0, 0, 1, "Side View");
+
 
 function imuOscar(message) {
     imu1.setAngles(message.roll, message.pitch, message.yaw);

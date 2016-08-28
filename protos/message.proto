@@ -28,9 +28,17 @@ message WheelAngleCommandedMessage {
 }
 
 // Should probably add some enum for status level?
-message TextMessage {
+message LogMessage {
+    enum LogLevel {
+        DEBUG = 0;
+        INFO = 1;
+        WARNING = 2;
+        ERROR = 3;
+        FATAL = 4;
+    }
     google.protobuf.Timestamp time = 1;
     string text = 2;
+    LogLevel log_level = 3;
 }
 
 message DataMessage {
@@ -49,7 +57,7 @@ message DataMessage {
         EncoderMessage enc = 3;
         WheelAngleCommandedMessage command_angle = 4;
         WheelAngleCommandedMessage actual_angle = 5;
-        TextMessage status = 6;
+        LogMessage status = 6;
     }
     DataType data_type = 7;
 }

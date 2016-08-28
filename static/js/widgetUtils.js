@@ -48,6 +48,12 @@ function makeCardDiv(divId, colCount = 8, height = "300px") {
     return div;
 }
 
+function makeCardCard(divId, colCount = 8, height = "300px") {
+    var div = makeCardDiv(divId, colCount, height);
+    div.className += " mdl-card mdl-color--primary";
+    return div;
+}
+
 // Registers a plot so that it resizes when the window resizes.
 function registerPlot(plot) {
     if (!this.plots) {

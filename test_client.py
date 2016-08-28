@@ -3,6 +3,7 @@
 import logging
 from protos.auth_pb2 import AuthMessage
 from protos.message_pb2 import DataMessage
+from protos.message_pb2 import LogMessage
 from packet import Packet
 import random
 import time
@@ -14,8 +15,7 @@ There is a theory which states that if ever anyone discovers exactly what the
 Universe is for and why it is here, it will instantly disappear and be replaced
 by something even more bizarre and inexplicable. There is another theory which
 states that this has already happened.
-""".split(" ")
-
+""".split()
 
 class Client(TCPClient):
     HOST = "localhost"
@@ -66,10 +66,13 @@ class Client(TCPClient):
 
     def make_status_data(self, data):
         # Just generate some fake text to make my life interesting.
-        data.status.text = " ".join(
+        level = random.choice(["DEBUG", "WARNING", "INFO", "ERROR", "FATAL"])
+        data.status.log_level = getattr(LogMessage, level)
+        data.status.text = ("[ %10s ] " % level) + " ".join(
             [random.choice(words).strip() for _ in range(10)])
         self.make_timestamp(data.status.time)
         data.data_type = DataMessage.STATUS
+
 
     def make_imu_data(self, data):
         data.imu.roll = random.uniform(-1, 1)
@@ -102,7 +105,7 @@ tornado.ioloop.PeriodicCallback(client.make_connection, 1000).start()
 tornado.ioloop.PeriodicCallback(client.async_send_stream(
     client.make_status_data), 5).start()
 tornado.ioloop.PeriodicCallback(client.async_send_stream(
-    client.make_imu_data), 5).start()
+    client.make_imu_data), 20).start()
 tornado.ioloop.PeriodicCallback(client.async_send_stream(
     client.make_gps_data), 1000).start()
 
