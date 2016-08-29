@@ -32,4 +32,3 @@ MessageMaster.handleMessage = function(event) {
         fn(message);
     }
 }
-

@@ -5,9 +5,12 @@ from protos.auth_pb2 import AuthMessage
 from protos.message_pb2 import DataMessage
 from protos.message_pb2 import LogMessage
 from packet import Packet
+import base64
 import random
 import time
 import tornado
+import cv2
+import numpy as np
 from tornado.tcpclient import TCPClient
 
 words = """
@@ -17,6 +20,7 @@ by something even more bizarre and inexplicable. There is another theory which
 states that this has already happened.
 """.split()
 
+
 class Client(TCPClient):
     HOST = "localhost"
     PORT = 4242
@@ -25,6 +29,12 @@ class Client(TCPClient):
         super().__init__()
         self.stream = None
         self.stream_ok = False
+        try:
+            self.camera = cv2.VideoCapture(0)
+            raise Exception()
+        except:
+            self.camera = None
+            self.imageColor = np.zeros(3, np.uint8)
 
     async def make_auth_connection(self):
         """Tries to connect to the server to auth against it.
@@ -73,13 +83,32 @@ class Client(TCPClient):
         self.make_timestamp(data.status.time)
         data.data_type = DataMessage.STATUS
 
-
     def make_imu_data(self, data):
         data.imu.roll = random.uniform(-1, 1)
         data.imu.pitch = random.uniform(-2, 2)
         data.imu.yaw = random.uniform(-3, 3)
         self.make_timestamp(data.imu.time)
         data.data_type = DataMessage.IMU
+
+    def make_camera_data(self, data):
+        data.camera.width = 3
+        data.camera.height = 3
+
+        # Lets you switch between camera and generated imagery
+        image = None
+        if self.camera is not None:
+            image = self.camera.read()[1]
+        if image is None:
+            image = np.ones((data.camera.height, data.camera.width, 3), np.uint8)
+            image *= self.imageColor
+            toAdd = np.array([0, 0, 0], np.uint8)
+            toAdd[random.randint(0, len(toAdd) - 1)] = random.randint(0, 10)
+            self.imageColor += toAdd
+            self.imageColor %= 255
+
+        data.camera.image = cv2.imencode(".jpg", image)[1].tostring()
+        self.make_timestamp(data.camera.time)
+        data.data_type = DataMessage.CAMERA
 
     def async_send_stream(self, gen_fn):
         async def send():
@@ -103,10 +132,12 @@ client = Client()
 tornado.ioloop.PeriodicCallback(client.make_connection, 1000).start()
 # Periodically send various types of messages
 tornado.ioloop.PeriodicCallback(client.async_send_stream(
-    client.make_status_data), 5).start()
+    client.make_status_data), 5).start() # 200 hz
 tornado.ioloop.PeriodicCallback(client.async_send_stream(
-    client.make_imu_data), 20).start()
+    client.make_imu_data), 20).start() # 50 hz
 tornado.ioloop.PeriodicCallback(client.async_send_stream(
-    client.make_gps_data), 1000).start()
+    client.make_gps_data), 1000).start() # 1 hz
+tornado.ioloop.PeriodicCallback(client.async_send_stream(
+    client.make_camera_data), 30).start() # 30 hz
 
 tornado.ioloop.IOLoop.instance().start()

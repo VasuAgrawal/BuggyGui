@@ -102,9 +102,11 @@ StatusBar.prototype.render = function() {
             var date = new Date (1000 * (message.time.seconds.toNumber() +
                                          message.time.nanos / 10e8));
             var localeString = date.toLocaleTimeString();
-            var dateString = "[ " + " ".repeat(10-localeString.length) +  date.toLocaleTimeString() + " ]";
+            var dateString = ("[ " +
+                    " ".repeat(Math.max(11-localeString.length, 0)) + 
+                    date.toLocaleTimeString() + " ]");
             var level = this.logLevel.children[message.log_level].name;
-            var levelString = "[ " + " ".repeat(10-level.length) + level + " ]";
+            var levelString = "[ " + " ".repeat(Math.max(7-level.length, 0)) + level + " ]";
             return dateString + levelString + " " + message.text;
         }).bind(this)).join("\n");
     statusBox.scrollTop = statusBox.scrollHeight;

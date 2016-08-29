@@ -41,6 +41,13 @@ message LogMessage {
     LogLevel log_level = 3;
 }
 
+message ImageMessage {
+    google.protobuf.Timestamp time = 1;
+    int32 width = 2;
+    int32 height = 3;
+    bytes image = 4;
+}
+
 message DataMessage {
     enum DataType {
         TEST = 0; // Ignore this message
@@ -50,6 +57,7 @@ message DataMessage {
         COMMAND_ANGLE = 4;
         ACTUAL_ANGLE = 5;
         STATUS = 6;
+        CAMERA = 7;
     }
     oneof data {
         ImuMessage imu = 1;
@@ -58,6 +66,7 @@ message DataMessage {
         WheelAngleCommandedMessage command_angle = 4;
         WheelAngleCommandedMessage actual_angle = 5;
         LogMessage status = 6;
+        ImageMessage camera = 8;
     }
     DataType data_type = 7;
 }
