@@ -27,6 +27,7 @@ Test Client Dependencies
 ------
 
 In addition to the dependencies above, you will also need:
+
 1. **OpenCV3**. Open source computer vision library for python. OpenCV2 doesn't
    support Python3, so it's necessary to use OpenCV2. There are a number of
    guides available to do this, such as [this]
