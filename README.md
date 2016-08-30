@@ -29,7 +29,7 @@ Test Client Dependencies
 In addition to the dependencies above, you will also need:
 
 1. **OpenCV3**. Open source computer vision library for python. OpenCV2 doesn't
-   support Python3, so it's necessary to use OpenCV2. There are a number of
+   support Python3, so it's necessary to use OpenCV3. There are a number of
    guides available to do this, such as [this]
    (http://www.pyimagesearch.com/2015/07/20/install-opencv-3-0-and-python-3-4-on-ubuntu/).
    After that's done, you should be able to do the following with no errors:
@@ -46,7 +46,7 @@ Usage
 ------
 
 For testing / development, you can run the following two processes (preferrably
-in separate terminals with i.e. tmux).
+in separate terminals with e.g. tmux).
 
 ```
 $ ./test_client.py # In one terminal.
@@ -60,3 +60,10 @@ The server is configured to be in debug mode for now, which, among other things,
 means that if you change any of the files that the server depends on it should
 restart automatically. If that doesn't work, CTRL-C will kill the client and
 server safely.
+
+Appendix
+------
+* Note that Ubuntu 14.04's repo seems to have Python 3.4 as its default when
+  installing with apt. Make sure to install Python 3.5, [as described here]
+  (http://askubuntu.com/questions/682869/how-do-i-install-newer-python-versions-using-apt-get/682875).
+
