@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
 
 import logging
+import random
+import time
+
+import cv2
+import numpy as np
+import tornado
+from tornado.tcpclient import TCPClient
 from protos.auth_pb2 import AuthMessage
 from protos.message_pb2 import DataMessage
 from protos.message_pb2 import LogMessage
 from packet import Packet
-import base64
-import random
-import time
-import tornado
-import cv2
-import numpy as np
-from tornado.tcpclient import TCPClient
 
 words = """
 There is a theory which states that if ever anyone discovers exactly what the
@@ -30,11 +30,12 @@ class Client(TCPClient):
         self.stream = None
         self.stream_ok = False
         try:
+            # Uncomment this to switch to generated colors
+            # raise Exception()
             self.camera = cv2.VideoCapture(0)
-            raise Exception()
         except:
             self.camera = None
-            self.imageColor = np.zeros(3, np.uint8)
+            self.image_color = np.zeros(3, np.uint8)
 
     async def make_auth_connection(self):
         """Tries to connect to the server to auth against it.
@@ -91,28 +92,32 @@ class Client(TCPClient):
         data.data_type = DataMessage.IMU
 
     def make_camera_data(self, data):
-        data.camera.width = 3
-        data.camera.height = 3
+        data.camera.width = 300
+        data.camera.height = 300
 
         # Lets you switch between camera and generated imagery
         image = None
         if self.camera is not None:
             image = self.camera.read()[1]
-        if image is None:
-            image = np.ones((data.camera.height, data.camera.width, 3), np.uint8)
-            image *= self.imageColor
-            toAdd = np.array([0, 0, 0], np.uint8)
-            toAdd[random.randint(0, len(toAdd) - 1)] = random.randint(0, 10)
-            self.imageColor += toAdd
-            self.imageColor %= 255
+            image = cv2.resize(image, (0, 0), fx=.5, fy=.5)
+            data.camera.width = image.shape[1]
+            data.camera.height = image.shape[0]
 
-        data.camera.image = cv2.imencode(".jpg", image)[1].tostring()
+        if image is None:
+            image = np.ones(
+                (data.camera.height, data.camera.width, 3), np.uint8)
+            image *= self.image_color
+            to_add = np.array([0, 0, 0], np.uint8)
+            to_add[random.randint(0, len(to_add) - 1)] = random.randint(0, 10)
+            self.image_color += to_add
+
+        data.camera.image = cv2.imencode(".png", image)[1].tostring()
         self.make_timestamp(data.camera.time)
         data.data_type = DataMessage.CAMERA
 
     def async_send_stream(self, gen_fn):
         async def send():
-            if (self.stream_ok):
+            if self.stream_ok:
                 try:
                     data = DataMessage()
                     gen_fn(data)
@@ -132,12 +137,12 @@ client = Client()
 tornado.ioloop.PeriodicCallback(client.make_connection, 1000).start()
 # Periodically send various types of messages
 tornado.ioloop.PeriodicCallback(client.async_send_stream(
-    client.make_status_data), 5).start() # 200 hz
+    client.make_status_data), 5).start()  # 200 hz
 tornado.ioloop.PeriodicCallback(client.async_send_stream(
-    client.make_imu_data), 20).start() # 50 hz
+    client.make_imu_data), 20).start()  # 50 hz
 tornado.ioloop.PeriodicCallback(client.async_send_stream(
-    client.make_gps_data), 1000).start() # 1 hz
+    client.make_gps_data), 1000).start()  # 1 hz
 tornado.ioloop.PeriodicCallback(client.async_send_stream(
-    client.make_camera_data), 30).start() # 30 hz
+    client.make_camera_data), 50).start()  # 30 hz
 
 tornado.ioloop.IOLoop.instance().start()

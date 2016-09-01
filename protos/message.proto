@@ -27,7 +27,6 @@ message WheelAngleCommandedMessage {
     double angle = 2;
 }
 
-// Should probably add some enum for status level?
 message LogMessage {
     enum LogLevel {
         DEBUG = 0;
@@ -42,10 +41,16 @@ message LogMessage {
 }
 
 message ImageMessage {
+    // This might contain delta or keyframes
+    enum FrameType {
+        KEYFRAME = 0;
+        DELTA = 1;
+    }
     google.protobuf.Timestamp time = 1;
     int32 width = 2;
     int32 height = 3;
     bytes image = 4;
+    FrameType frame_type = 5;
 }
 
 message DataMessage {

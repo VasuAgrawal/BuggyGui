@@ -1,3 +1,4 @@
+import cv2
 import os
 import logging
 import tornado
@@ -27,7 +28,10 @@ class BaseWsHandler(tornado.websocket.WebSocketHandler):
     def on_close(self):
         logging.info("Websocket closed!")
         if self in clients:
-            clients.remove(self)
+            try:
+                clients.remove(self)
+            except:
+                pass
 
 
 def _make_app():
@@ -48,15 +52,14 @@ def _make_app():
 def queue_test():
     while True:
         data_message = yield data_queue.get()
-        # clients_to_remove = []
         for client in clients[::-1]:
             try:
                 yield client.write_message(data_message, binary=True)
             except:
-                clients.remove(client)
-                # clients_to_remove.append(client)
-        # for client in clients_to_remove:
-            # clients.remove(client)
+                try:
+                    clients.remove(client)
+                except:
+                    pass
 
 
 # This is meant to look like a class definition
