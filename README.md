@@ -22,12 +22,6 @@ Server Dependencies
    Follow the install instructions at the link. You need to build and install 
    the C++ version to get `protoc` in addition to the Python version. The Python
    version provided will work for both Python 2 and Python 3.
-
-Test Client Dependencies
-------
-
-In addition to the dependencies above, you will also need:
-
 1. **OpenCV3**. Open source computer vision library for python. OpenCV2 doesn't
    support Python3, so it's necessary to use OpenCV3. There are a number of
    guides available to do this, such as [this]
