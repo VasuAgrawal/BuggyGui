@@ -15,11 +15,12 @@ from protos.message_pb2 import ImageMessage
 
 
 class BuggyDataServer(tornado.tcpserver.TCPServer):
+
     def __init__(self, data_queue, *args, **kwargs):
         self.data_queue = data_queue
         self.prev_image = None
         self.keyframe_time = time.time()
-        self.diff_time = 5 # seconds
+        self.diff_time = 5  # seconds
 
         super().__init__(*args, **kwargs)
 
@@ -27,7 +28,7 @@ class BuggyDataServer(tornado.tcpserver.TCPServer):
         if (data.data_type == DataMessage.CAMERA):
             # Always decode the image.
             current_image = cv2.imdecode(np.fromstring(data.camera.image,
-                np.uint8), 1)
+                                                       np.uint8), 1)
 
             # Some conditions under which we let the keyframe pass through
             # TODO(vasua): Condense these.
@@ -50,7 +51,6 @@ class BuggyDataServer(tornado.tcpserver.TCPServer):
             data.camera.image = cv2.imencode(".png", diff)[1].tostring()
             self.prev_image = current_image
 
-
     @tornado.gen.coroutine
     def handle_stream(self, stream, address):
         logging.debug("Incoming connection request from %s", address)
@@ -67,7 +67,4 @@ class BuggyDataServer(tornado.tcpserver.TCPServer):
             self.cameraStuff(data)
             data_message = data.SerializeToString()
 
-            # Here we have a data message proto. Currently it gets piped through
-            # directly, but in order to put into an appropriate database it
-            # needs to be decoded.
-            yield self.data_queue.put(data_message)
+            self.data_queue.put(data_message)

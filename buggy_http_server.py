@@ -1,13 +1,14 @@
-import cv2
 import os
 import logging
+
 import tornado
 import tornado.web
 import tornado.websocket
 import tornado.httpserver
 
-clients = []
+clients = set()
 data_queue = None
+
 
 class RootHandler(tornado.web.RequestHandler):
 
@@ -15,23 +16,22 @@ class RootHandler(tornado.web.RequestHandler):
         self.render("static/index.html")
 
 
-
 class BaseWsHandler(tornado.websocket.WebSocketHandler):
 
     def open(self):
         logging.info("Websocket opened!")
-        clients.append(self)
+        clients.add(self)
+        print(self)
 
     def on_message(self, message):
         logging.info("Received message: %s", message)
 
     def on_close(self):
         logging.info("Websocket closed!")
-        if self in clients:
-            try:
-                clients.remove(self)
-            except:
-                pass
+        try:
+            clients.remove(self)
+        except:
+            pass
 
 
 def _make_app():
@@ -52,18 +52,17 @@ def _make_app():
 def queue_test():
     while True:
         data_message = yield data_queue.get()
-        for client in clients[::-1]:
-            try:
-                yield client.write_message(data_message, binary=True)
-            except:
-                try:
-                    clients.remove(client)
-                except:
-                    pass
 
+        for client in clients:
+            try:
+                client.write_message(data_message, binary=True)
+            except:
+                pass
 
 # This is meant to look like a class definition
-def BuggyHttpServer(q): # pylint: disable=invalid-name
+
+
+def BuggyHttpServer(q):  # pylint: disable=invalid-name
     global data_queue
     data_queue = q
     queue_test()

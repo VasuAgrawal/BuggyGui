@@ -114,6 +114,8 @@ class Client(TCPClient):
         data.camera.image = cv2.imencode(".png", image)[1].tostring()
         self.make_timestamp(data.camera.time)
         data.data_type = DataMessage.CAMERA
+        cv2.imshow("TEST CLIENT", image)
+        cv2.waitKey(1)
 
     def async_send_stream(self, gen_fn):
         async def send():
@@ -136,12 +138,12 @@ client = Client()
 # Every second, try to authenticate and establish a connection.
 tornado.ioloop.PeriodicCallback(client.make_connection, 1000).start()
 # Periodically send various types of messages
-tornado.ioloop.PeriodicCallback(client.async_send_stream(
-    client.make_status_data), 5).start()  # 200 hz
-tornado.ioloop.PeriodicCallback(client.async_send_stream(
-    client.make_imu_data), 20).start()  # 50 hz
-tornado.ioloop.PeriodicCallback(client.async_send_stream(
-    client.make_gps_data), 1000).start()  # 1 hz
+# tornado.ioloop.PeriodicCallback(client.async_send_stream(
+    # client.make_status_data), 5).start()  # 200 hz
+# tornado.ioloop.PeriodicCallback(client.async_send_stream(
+    # client.make_imu_data), 20).start()  # 50 hz
+# tornado.ioloop.PeriodicCallback(client.async_send_stream(
+    # client.make_gps_data), 1000).start()  # 1 hz
 tornado.ioloop.PeriodicCallback(client.async_send_stream(
     client.make_camera_data), 50).start()  # 30 hz
 
