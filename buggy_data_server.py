@@ -29,6 +29,7 @@ class BuggyDataServer(tornado.tcpserver.TCPServer):
             # Always decode the image.
             current_image = cv2.imdecode(np.fromstring(data.camera.image,
                                                        np.uint8), 1)
+            
 
             # Some conditions under which we let the keyframe pass through
             # TODO(vasua): Condense these.
@@ -50,6 +51,13 @@ class BuggyDataServer(tornado.tcpserver.TCPServer):
             diff = current_image - self.prev_image
             data.camera.image = cv2.imencode(".png", diff)[1].tostring()
             self.prev_image = current_image
+
+            # TODO(vasua): Figure out some better means of denoising the image.
+            # image = cv2.fastNlMeansDenoisingColored(image, None, 10, 10, 7, 21)
+            diff = cv2.GaussianBlur(diff, (5, 5), 0)
+
+            cv2.imshow("DATA SERVER", diff)
+            cv2.waitKey(1)
 
     @tornado.gen.coroutine
     def handle_stream(self, stream, address):

@@ -57,15 +57,22 @@ CameraStreamNew.prototype.onImageParse = function() {
         }
     }
 
+    // At this point, the image data has been created. Now it needs to be
+    // resized to the proper dimensions.
     if (this.hasKeyframe) {
+        var scaleFactor = Math.min(this.canvas.width / this.prevFrameData.width,
+                this.canvas.height / this.prevFrameData.height);
+    
+        // This should fill the canvas.
+        this.bufferCtx.putImageData(this.prevFrameData, 0, 0);
+        
         this.ctx.fillStyle = 'black';
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-
-        // TODO(vasua): putImageData doesn't scale the image, so come up with a
-        // custom scaling function or find another way of doing it.
-        var x = this.canvas.width / 2 - this.prevFrameData.width / 2;
-        var y = this.canvas.height / 2 - this.prevFrameData.height / 2;
-        this.ctx.putImageData(this.prevFrameData, x, y, 0, 0, this.canvas.width - x, this.canvas.height - y);
+        this.ctx.scale(scaleFactor, scaleFactor);
+        var x = Math.floor(.5 * (this.canvas.width / scaleFactor - this.prevFrameData.width));
+        var y = Math.floor(.5 * (this.canvas.height / scaleFactor - this.prevFrameData.height));
+        this.ctx.drawImage(this.bufferCanvas, x, y);
+        this.ctx.scale(1/scaleFactor, 1/scaleFactor);
     }
 }
 
