@@ -7,7 +7,7 @@ import time
 import cv2
 import numpy as np
 import tornado
-from tornado.tcpclient import TCPClient
+from auth_client import AuthClient
 from protos.auth_pb2 import AuthMessage
 from protos.message_pb2 import DataMessage
 from protos.message_pb2 import LogMessage
@@ -21,46 +21,19 @@ states that this has already happened.
 """.split()
 
 
-class Client(TCPClient):
+class Client(AuthClient):
     HOST = "localhost"
     PORT = 4242
 
     def __init__(self):
-        super().__init__()
-        self.stream = None
-        self.stream_ok = False
+        super().__init__("42", "RoboBuggy", "Transistor")
         try:
             # Uncomment this to switch to generated colors
-            # raise Exception()
+            raise Exception()
             self.camera = cv2.VideoCapture(0)
         except:
             self.camera = None
             self.image_color = np.zeros(3, np.uint8)
-
-    async def make_auth_connection(self):
-        """Tries to connect to the server to auth against it.
-
-        Might throw an exception.
-        """
-        auth_message = AuthMessage()
-        auth_message.secret_key = "42"
-        auth_message.team_name = "RoboBuggy"
-        auth_message.buggy_name = "Transistor"
-        data = Packet.make_packet_from_bytes(auth_message.SerializeToString())
-        await self.stream.write(data)
-        self.stream_ok = True
-
-    @tornado.gen.coroutine
-    def make_connection(self):
-        if not self.stream:
-            try:
-                self.stream = yield self.connect(self.HOST, self.PORT)
-                yield self.make_auth_connection()
-            except tornado.iostream.StreamClosedError as e:
-                logging.warning("%s [Hint: server may be down!]", e)
-        elif self.stream.closed():
-            self.stream = None
-            self.stream_ok = False
 
     def make_timestamp(self, timestamp):
         now = time.time()
@@ -138,12 +111,12 @@ client = Client()
 # Every second, try to authenticate and establish a connection.
 tornado.ioloop.PeriodicCallback(client.make_connection, 1000).start()
 # Periodically send various types of messages
-# tornado.ioloop.PeriodicCallback(client.async_send_stream(
-    # client.make_status_data), 5).start()  # 200 hz
-# tornado.ioloop.PeriodicCallback(client.async_send_stream(
-    # client.make_imu_data), 20).start()  # 50 hz
-# tornado.ioloop.PeriodicCallback(client.async_send_stream(
-    # client.make_gps_data), 1000).start()  # 1 hz
+tornado.ioloop.PeriodicCallback(client.async_send_stream(
+    client.make_status_data), 5).start()  # 200 hz
+tornado.ioloop.PeriodicCallback(client.async_send_stream(
+    client.make_imu_data), 20).start()  # 50 hz
+tornado.ioloop.PeriodicCallback(client.async_send_stream(
+    client.make_gps_data), 1000).start()  # 1 hz
 tornado.ioloop.PeriodicCallback(client.async_send_stream(
     client.make_camera_data), 50).start()  # 30 hz
 

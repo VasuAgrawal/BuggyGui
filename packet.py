@@ -1,4 +1,6 @@
 class Packet(object):
+    # TODO(vasua): Turn this into a length encoded packet instead of
+    # header/footer. Apparently that's better for longer messages.
     # Python3 supports unicode strings, these could be emojis if I suppose ...
     HEADER = "42".encode("utf-8")
     FOOTER = "How many paths must a man walk?".encode("utf-8")

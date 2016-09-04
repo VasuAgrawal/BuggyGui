@@ -7,6 +7,7 @@ import time
 import tornado
 import tornado.tcpserver
 import tornado.gen
+import tornado.iostream
 import tornado.web
 import stream_auth
 from packet import Packet
@@ -16,11 +17,11 @@ from protos.message_pb2 import ImageMessage
 
 class BuggyDataServer(tornado.tcpserver.TCPServer):
 
-    def __init__(self, data_queue, *args, **kwargs):
-        self.data_queue = data_queue
+    def __init__(self, *args, **kwargs):
         self.prev_image = None
         self.keyframe_time = time.time()
         self.diff_time = 5  # seconds
+        self.httpservers = set()
 
         super().__init__(*args, **kwargs)
 
@@ -56,23 +57,45 @@ class BuggyDataServer(tornado.tcpserver.TCPServer):
             # image = cv2.fastNlMeansDenoisingColored(image, None, 10, 10, 7, 21)
             diff = cv2.GaussianBlur(diff, (5, 5), 0)
 
-            cv2.imshow("DATA SERVER", diff)
-            cv2.waitKey(1)
+            # cv2.imshow("DATA SERVER", diff)
+            # cv2.waitKey(1)
+
+    @tornado.gen.coroutine
+    def handle_server(self, stream, address):
+        # Takes an auth'd server and sends data to it.
+        self.httpservers.add(stream)
+
+    @tornado.gen.coroutine
+    def handle_buggy(self, stream, address, key):
+        while True:
+            try:
+                data_message = (
+                    yield Packet.get_packet_data_as_bytes_from_stream(stream))
+                data = DataMessage()
+                data.ParseFromString(data_message)
+                self.cameraStuff(data)
+                data_message = data.SerializeToString()
+            except (tornado.iostream.StreamClosedError, AssertionError) as e:
+                # Make sure to return, otherwise we get stuck in an infinite
+                # loop here and the server dies.
+                stream_auth.reset_key(key)
+                return
+
+            for server in self.httpservers:
+                server.write(Packet.make_packet_from_bytes(data_message))
 
     @tornado.gen.coroutine
     def handle_stream(self, stream, address):
-        logging.debug("Incoming connection request from %s", address)
+        logging.info("Incoming connection request from %s", address)
         buggy_info = yield stream_auth.auth_stream(stream, address)
         if not buggy_info:
             return
-        logging.debug("Starting to receive data from %s's buggy %s!",
+        logging.info("Starting to receive data from %s's buggy %s!",
                       buggy_info.team_name, buggy_info.buggy_name)
-        while True:
-            data_message = (
-                yield Packet.get_packet_data_as_bytes_from_stream(stream))
-            data = DataMessage()
-            data.ParseFromString(data_message)
-            self.cameraStuff(data)
-            data_message = data.SerializeToString()
 
-            self.data_queue.put(data_message)
+        # There has to be a better way.
+        if buggy_info.team_name == "Server":
+            self.handle_server(stream, address)
+        else:
+            self.handle_buggy(stream, address, buggy_info.secret_key)
+
