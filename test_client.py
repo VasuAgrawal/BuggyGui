@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import logging
+import math
 import random
 import time
 
@@ -10,6 +11,7 @@ import tornado
 from auth_client import AuthClient
 from protos.auth_pb2 import AuthMessage
 from protos.message_pb2 import DataMessage
+from protos.message_pb2 import ImuMessage
 from protos.message_pb2 import LogMessage
 from packet import Packet
 
@@ -35,6 +37,11 @@ class Client(AuthClient):
             self.camera = None
             self.image_color = np.zeros(3, np.uint8)
 
+        # IMU initialization
+        self.imu_start = time.time()
+        self.imu_period = 1  # Every second, do a full revolution
+        self.imu = ImuMessage()
+
     def make_timestamp(self, timestamp):
         now = time.time()
         seconds = int(now)
@@ -58,10 +65,17 @@ class Client(AuthClient):
         data.data_type = DataMessage.STATUS
 
     def make_imu_data(self, data):
-        data.imu.roll = random.uniform(-1, 1)
-        data.imu.pitch = random.uniform(-2, 2)
-        data.imu.yaw = random.uniform(-3, 3)
-        self.make_timestamp(data.imu.time)
+        time_diff = (time.time() - self.imu_start)
+        self.imu.roll += ((time_diff / self.imu_period) * 2 * math.pi)
+        self.imu.roll = self.imu.roll % (2 * math.pi)
+        self.imu.pitch += ((time_diff / self.imu_period) * 2 * math.pi)
+        self.imu.pitch = self.imu.pitch % (2 * math.pi)
+        self.imu_start = time.time()
+        # data.imu.roll = random.uniform(-1, 1)
+        # data.imu.pitch = random.uniform(-2, 2)
+        # data.imu.yaw = random.uniform(-3, 3)
+        self.make_timestamp(self.imu.time)
+        data.imu.CopyFrom(self.imu)
         data.data_type = DataMessage.IMU
 
     def make_camera_data(self, data):

@@ -29,6 +29,11 @@ function CameraStreamNew(divId) {
     this.bufferCtx = this.bufferCanvas.getContext("2d");
     this.messageType = -1;
     this.prevFrameData = undefined;
+
+    this.paused = false;
+    this.canvas.addEventListener("click", (function(event) {
+        this.paused = !this.paused;
+    }).bind(this));
 }
 
 CameraStreamNew.prototype.resizeCanvas = function() {
@@ -66,13 +71,15 @@ CameraStreamNew.prototype.onImageParse = function() {
         // This should fill the canvas.
         this.bufferCtx.putImageData(this.prevFrameData, 0, 0);
         
-        this.ctx.fillStyle = 'black';
-        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-        this.ctx.scale(scaleFactor, scaleFactor);
-        var x = Math.floor(.5 * (this.canvas.width / scaleFactor - this.prevFrameData.width));
-        var y = Math.floor(.5 * (this.canvas.height / scaleFactor - this.prevFrameData.height));
-        this.ctx.drawImage(this.bufferCanvas, x, y);
-        this.ctx.scale(1/scaleFactor, 1/scaleFactor);
+        if (!this.paused) {
+            this.ctx.fillStyle = 'black';
+            this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+            this.ctx.scale(scaleFactor, scaleFactor);
+            var x = Math.floor(.5 * (this.canvas.width / scaleFactor - this.prevFrameData.width));
+            var y = Math.floor(.5 * (this.canvas.height / scaleFactor - this.prevFrameData.height));
+            this.ctx.drawImage(this.bufferCanvas, x, y);
+            this.ctx.scale(1/scaleFactor, 1/scaleFactor);
+        }
     }
 }
 

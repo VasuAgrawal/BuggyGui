@@ -1,18 +1,5 @@
-function initializeStatus(divId) {
-    var card = makeCardDiv(divId, colCount = 4);
-    card.className = "mdl-card";
-
-    title = document.createElement("div");
-    title.className = "mdl-card__title";
-    titleText = document.createElement("h2");
-    titleText.className = "mdl-card__title-text";
-    titleText.innerHTML = "Robobuggy Statuses";
-    title.appendChild(titleText);
-    card.appendChild(title);
-
-}
-
 function StatusBar(divId) {
+    this.divId = divId;
     this.messages = [];
     this.logMessage = MessageMaster.builder.build("LogMessage");
     this.logLevel = MessageMaster.builder.lookup("LogMessage.LogLevel");
@@ -83,6 +70,14 @@ StatusBar.prototype.makeStatusBar = function(divId) {
     this.wat = 123;
 }
 
+StatusBar.prototype.delete = function() {
+    var thisElem = document.getElementById(this.divId);
+    while(thisElem.lastChild) {
+        thisElem.removeChild(thisElem.lastChild);
+    }
+    // TODO(vasua): Clear the div of all properties as well.
+}
+
 StatusBar.prototype.onStatusMessage = function(message) {
     this.messages.push(message);
 }
@@ -113,6 +108,5 @@ StatusBar.prototype.render = function() {
     setTimeout(this.render.bind(this), this.renderTimeout);
 }
 
-//initializeStatus("statuses");
 var statusbar = new StatusBar("statusbar");
 MessageMaster.registerCallback("STATUS", function(message) {statusbar.onStatusMessage(message)});

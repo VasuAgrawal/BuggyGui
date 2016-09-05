@@ -1,4 +1,4 @@
-initializeScatter("graph4");
+//initializeScatter("graph4");
 
 // At some point this will need to call the Google maps api and deploy points
 // that way.
@@ -8,4 +8,4 @@ function onGpsMessage(message) {
     Plotly.extendTraces(plot, {x: [[time]], y: [[message.lat]]}, [0], 10);
 }
 
-MessageMaster.registerCallback("GPS", onGpsMessage);
+//MessageMaster.registerCallback("GPS", onGpsMessage);
