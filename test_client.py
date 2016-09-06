@@ -12,6 +12,7 @@ from auth_client import AuthClient
 from protos.auth_pb2 import AuthMessage
 from protos.message_pb2 import DataMessage
 from protos.message_pb2 import ImuMessage
+from protos.message_pb2 import GpsMessage
 from protos.message_pb2 import LogMessage
 from packet import Packet
 
@@ -42,6 +43,36 @@ class Client(AuthClient):
         self.imu_period = 1  # Every second, do a full revolution
         self.imu = ImuMessage()
 
+        # GPS initialization
+        self.course_points = np.array([
+            (40.441760, -79.941561),
+            (40.440168, -79.942258),
+            (40.440078, -79.943041),
+            (40.439090, -79.944125),
+            (40.438665, -79.945648),
+            (40.438878, -79.946421),
+            (40.439735, -79.946818),
+            (40.440723, -79.948255),
+            (40.441507, -79.947225),
+            (40.440437, -79.942140),
+            ])
+
+        self.point_distances = np.zeros(len(self.course_points) - 1)
+        for i in range(len(self.course_points) - 1):
+            self.point_distances[i] = np.linalg.norm(
+                    self.course_points[i] - self.course_points[(i+1)])
+        self.course_distances = np.cumsum(self.point_distances)
+        self.course_distances = np.insert(self.course_distances, [0], [0])
+        self.total_distance = self.course_distances[-1]
+
+        self.gps_start = time.time()
+        self.gps_period = 120 # seconds, slightly faster than the record.
+        self.gps = GpsMessage()
+        self.gps.lat = self.course_points[0][0]
+        self.gps.long = self.course_points[0][1]
+        self.gps_distance = 0
+
+
     def make_timestamp(self, timestamp):
         now = time.time()
         seconds = int(now)
@@ -50,9 +81,24 @@ class Client(AuthClient):
         timestamp.nanos = nanos
 
     def make_gps_data(self, data):
-        data.gps.lat = random.uniform(40.5, 41)
-        data.gps.long = random.uniform(42, 42.5)
-        self.make_timestamp(data.gps.time)
+        self.gps_distance += self.total_distance * (time.time() -
+                self.gps_start) / self.gps_period
+        self.gps_start = time.time()
+        self.gps_distance %= self.total_distance
+        point_left = np.searchsorted(self.course_distances, self.gps_distance)
+        point_right = np.searchsorted(self.course_distances, self.gps_distance,
+                "right")
+        point_left -= point_left == point_right
+        distance_from_prev_point = (self.gps_distance -
+                self.course_distances[point_left])
+        distance_to_next_point = self.point_distances[point_left]
+        slope = self.course_points[point_right] - self.course_points[point_left]
+        change = slope * (distance_from_prev_point / distance_to_next_point)
+        point = self.course_points[point_left] + change
+        self.gps.lat = point[0]
+        self.gps.long = point[1]
+        self.make_timestamp(self.gps.time)
+        data.gps.CopyFrom(self.gps)
         data.data_type = DataMessage.GPS
 
     def make_status_data(self, data):
@@ -130,7 +176,7 @@ tornado.ioloop.PeriodicCallback(client.async_send_stream(
 tornado.ioloop.PeriodicCallback(client.async_send_stream(
     client.make_imu_data), 20).start()  # 50 hz
 tornado.ioloop.PeriodicCallback(client.async_send_stream(
-    client.make_gps_data), 1000).start()  # 1 hz
+    client.make_gps_data), 500).start()  # 1 hz
 tornado.ioloop.PeriodicCallback(client.async_send_stream(
     client.make_camera_data), 50).start()  # 30 hz
 
