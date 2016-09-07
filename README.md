@@ -44,7 +44,7 @@ in separate terminals with e.g. tmux).
 
 ```
 $ ./test_client.py # In one terminal.
-$ ./tcp_server.py # In another terminal.
+$ ./server.py # In another terminal.
 ```
 
 Then, in the browser, navigate to

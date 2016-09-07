@@ -49,7 +49,13 @@ class SubClient(AuthClient):
             else:
                 yield tornado.gen.sleep(1)
 
-
+# TODO(vasua): Overhaul this to be rate limited to the client, preferring to
+# send larger chunks of data in slower intervals. The client will the need to
+# figure out whether to use the newest piece of data, or use all of them. This
+# is probably something that can be negotiated between the MessageMaster and the
+# server with no change to any of the clients.
+# TODO(vasua): Run this behind an nginx load balancer.
+# TODO(vasua): Run this inside a docker container.
 class BuggyHttpServer(tornado.httpserver.HTTPServer):
 
     @staticmethod

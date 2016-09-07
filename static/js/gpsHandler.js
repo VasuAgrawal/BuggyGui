@@ -30,6 +30,50 @@ function WaypointViewer(divId) {
     this.maxVelocity = 14;
     this.minColor = [255, 100, 0];
     this.maxColor = [0, 100, 255];
+
+    this.map.controls[google.maps.ControlPosition.TOP_RIGHT].push(this.makeLegend());
+}
+
+// TODO(vasua): Make the legend look a little prettier.
+// TODO(vasua): Make legend support multiple color stops.
+WaypointViewer.prototype.makeLegend = function() {
+    // Create container div and stylings for it.
+    var legendDiv = document.createElement("div");
+    legendDiv.style.padding = 10;
+
+    // Create canvas and context.
+    var canv = document.createElement("canvas");
+    canv.className = "mdl-shadow--2dp";
+    canv.width = 74;
+    canv.height = 100;
+    canv.style.borderRadius = "3px";
+    var ctx = canv.getContext("2d");
+
+    ctx.fillStyle = "white";
+    ctx.fillRect(0, 0, canv.width, canv.height);
+    var gradient = ctx.createLinearGradient(0, 0, 0, canv.height);
+    gradient.addColorStop(1, "rgb(" + this.minColor[0] + ", " + 
+            this.minColor[1] + ", " + this.minColor[2] + ")");
+    gradient.addColorStop(0, "rgb(" + this.maxColor[0] + ", " + 
+            this.maxColor[1] + ", " + this.maxColor[2] + ")");
+    ctx.fillStyle = gradient;
+    var legendBarWidth = 32;
+    ctx.fillRect(canv.width - legendBarWidth, 0, canv.width, canv.height);
+
+    var legendStops = 6;
+    var textHeight = 9;
+    var padding = 4;
+    ctx.textAlign = "end";
+    ctx.fillStyle = "black";
+    ctx.font = "10px Arial";
+    for (var i = 0, vel = this.minVelocity;
+            vel <= this.maxVelocity;
+            ++i, vel += (this.maxVelocity - this.minVelocity) / legendStops) {
+        ctx.fillText(vel + " m/s  ", canv.width - legendBarWidth,
+                canv.height - padding - ((canv.height - 2 * padding - textHeight) / legendStops) * i);
+    }
+    legendDiv.appendChild(canv);
+    return legendDiv;
 }
 
 // Shamelessly copied from stack overflow:

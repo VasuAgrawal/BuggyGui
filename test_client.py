@@ -4,6 +4,7 @@ import logging
 import math
 import random
 import time
+from threading import Thread
 
 import cv2
 import numpy as np
@@ -55,23 +56,22 @@ class Client(AuthClient):
             (40.440723, -79.948255),
             (40.441507, -79.947225),
             (40.440437, -79.942140),
-            ])
+        ])
 
         self.point_distances = np.zeros(len(self.course_points) - 1)
         for i in range(len(self.course_points) - 1):
             self.point_distances[i] = np.linalg.norm(
-                    self.course_points[i] - self.course_points[(i+1)])
+                self.course_points[i] - self.course_points[(i + 1)])
         self.course_distances = np.cumsum(self.point_distances)
         self.course_distances = np.insert(self.course_distances, [0], [0])
         self.total_distance = self.course_distances[-1]
 
         self.gps_start = time.time()
-        self.gps_period = 120 # seconds, slightly faster than the record.
+        self.gps_period = 120  # seconds, slightly faster than the record.
         self.gps = GpsMessage()
         self.gps.lat = self.course_points[0][0]
         self.gps.long = self.course_points[0][1]
         self.gps_distance = 0
-
 
     def make_timestamp(self, timestamp):
         now = time.time()
@@ -82,17 +82,18 @@ class Client(AuthClient):
 
     def make_gps_data(self, data):
         self.gps_distance += self.total_distance * (time.time() -
-                self.gps_start) / self.gps_period
+                                                    self.gps_start) / self.gps_period
         self.gps_start = time.time()
         self.gps_distance %= self.total_distance
         point_left = np.searchsorted(self.course_distances, self.gps_distance)
         point_right = np.searchsorted(self.course_distances, self.gps_distance,
-                "right")
+                                      "right")
         point_left -= point_left == point_right
         distance_from_prev_point = (self.gps_distance -
-                self.course_distances[point_left])
+                                    self.course_distances[point_left])
         distance_to_next_point = self.point_distances[point_left]
-        slope = self.course_points[point_right] - self.course_points[point_left]
+        slope = self.course_points[point_right] - \
+            self.course_points[point_left]
         change = slope * (distance_from_prev_point / distance_to_next_point)
         point = self.course_points[point_left] + change
         self.gps.lat = point[0]
@@ -114,8 +115,8 @@ class Client(AuthClient):
         time_diff = (time.time() - self.imu_start)
         self.imu.roll += ((time_diff / self.imu_period) * 2 * math.pi)
         self.imu.roll = self.imu.roll % (2 * math.pi)
-        self.imu.pitch += ((time_diff / self.imu_period) * 2 * math.pi)
-        self.imu.pitch = self.imu.pitch % (2 * math.pi)
+        # self.imu.pitch += ((time_diff / self.imu_period) * 2 * math.pi)
+        # self.imu.pitch = self.imu.pitch % (2 * math.pi)
         self.imu_start = time.time()
         # data.imu.roll = random.uniform(-1, 1)
         # data.imu.pitch = random.uniform(-2, 2)
@@ -164,20 +165,21 @@ class Client(AuthClient):
         return send
 
 
-# Setup the client
-logging.basicConfig(level=logging.DEBUG)
-client = Client()
+if __name__ == "__main__":
+    # Setup the client
+    logging.basicConfig(level=logging.DEBUG)
+    client = Client()
 
-# Every second, try to authenticate and establish a connection.
-tornado.ioloop.PeriodicCallback(client.make_connection, 1000).start()
-# Periodically send various types of messages
-tornado.ioloop.PeriodicCallback(client.async_send_stream(
-    client.make_status_data), 5).start()  # 200 hz
-tornado.ioloop.PeriodicCallback(client.async_send_stream(
-    client.make_imu_data), 20).start()  # 50 hz
-tornado.ioloop.PeriodicCallback(client.async_send_stream(
-    client.make_gps_data), 500).start()  # 1 hz
-tornado.ioloop.PeriodicCallback(client.async_send_stream(
-    client.make_camera_data), 50).start()  # 30 hz
+    # Every second, try to authenticate and establish a connection.
+    tornado.ioloop.PeriodicCallback(client.make_connection, 1000).start()
+    # Periodically send various types of messages
+    tornado.ioloop.PeriodicCallback(client.async_send_stream(
+        client.make_status_data), 5).start()  # 200 hz
+    tornado.ioloop.PeriodicCallback(client.async_send_stream(
+        client.make_imu_data), 20).start()  # 50 hz
+    tornado.ioloop.PeriodicCallback(client.async_send_stream(
+        client.make_gps_data), 500).start()  # 1 hz
+    tornado.ioloop.PeriodicCallback(client.async_send_stream(
+        client.make_camera_data), 50).start()  # 30 hz
 
-tornado.ioloop.IOLoop.instance().start()
+    tornado.ioloop.IOLoop.instance().start()
