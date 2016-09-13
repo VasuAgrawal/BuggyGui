@@ -61,3 +61,25 @@ Appendix
   installing with apt. Make sure to install Python 3.5, [as described here]
   (http://askubuntu.com/questions/682869/how-do-i-install-newer-python-versions-using-apt-get/682875).
 
+
+Docker
+------
+Install Docker by following some of [these instructions]
+(https://www.digitalocean.com/community/tutorials/how-to-run-nginx-in-a-docker-container-on-ubuntu-14-04).
+
+You can build the Docker image for the server with all of the necessary
+dependencies by doing the following:
+
+```
+cd docker
+docker build -t server .
+```
+
+Then, once that's built (will take a while, but you only need to do it once),
+you can do the following. This should have the server running in a background
+daemon with files copied from your local branch. To see changes to the server,
+you'll need to manually restart since I haven't figured out how to hotlink
+instead of copy with docker data volumes.
+```
+docker run -p 8080:8080 -p 4242:4242 -t -d -i -v $(pwd):/buggy server:latest /buggy/server.py
+```

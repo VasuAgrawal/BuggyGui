@@ -1,21 +1,26 @@
 #!/usr/bin/env python3
 
+import argparse
 import logging
 import math
 import random
 import time
-from threading import Thread
 
 import cv2
 import numpy as np
 import tornado
 from auth_client import AuthClient
-from protos.auth_pb2 import AuthMessage
 from protos.message_pb2 import DataMessage
 from protos.message_pb2 import ImuMessage
 from protos.message_pb2 import GpsMessage
 from protos.message_pb2 import LogMessage
 from packet import Packet
+
+parser = argparse.ArgumentParser(description="Test client for Buggy Server.")
+parser.add_argument("--buggy-name", type=str, help="Which buggy name to use.",
+                    default="Transistor")
+parser.add_argument("--team-name", type=str, help="Which team name to use.",
+                    default="RoboBuggy")
 
 words = """
 There is a theory which states that if ever anyone discovers exactly what the
@@ -29,8 +34,8 @@ class Client(AuthClient):
     HOST = "localhost"
     PORT = 4242
 
-    def __init__(self):
-        super().__init__("42", "RoboBuggy", "Transistor")
+    def __init__(self, team_name, buggy_name):
+        super().__init__("42", team_name, buggy_name)
         try:
             # Uncomment this to switch to generated colors
             raise Exception()
@@ -166,9 +171,12 @@ class Client(AuthClient):
 
 
 if __name__ == "__main__":
+    args = parser.parse_args()
+    print(args)
+
     # Setup the client
     logging.basicConfig(level=logging.DEBUG)
-    client = Client()
+    client = Client(args.team_name, args.buggy_name)
 
     # Every second, try to authenticate and establish a connection.
     tornado.ioloop.PeriodicCallback(client.make_connection, 1000).start()

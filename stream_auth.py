@@ -1,5 +1,6 @@
 """Authenticate a Tornado IO stream to receive a buggy's data run."""
 
+import os
 import logging
 from protos.auth_pb2 import AuthMessage
 from packet import Packet
@@ -8,7 +9,7 @@ valid_keys = set()
 used_keys = set()
 # TODO(vasua): Replace this with a DB lookup every time there's an
 # authentication request.
-with open("KEYS", "r") as f:
+with open(os.path.join(os.path.dirname(os.path.realpath(__file__)), "KEYS"), "r") as f:
     valid_keys.update([line.strip() for line in f.readlines()])
 print(valid_keys)
 
