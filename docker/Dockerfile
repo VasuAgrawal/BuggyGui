@@ -1,22 +1,14 @@
 FROM ubuntu:16.04
-
-# Start by installing Python3, pip, and setuptools.
-RUN apt-get update && apt-get install -y \
-    python3 \
-    python3-pip \
-    python3-setuptools \
-    && apt-get -y clean all \
-    && rm -rf /var/lib/apt/lists/*
-
-# ======================= TORNADO ======================
-
-# Install tornado.
-RUN pip3 install tornado
+MAINTAINER Vasu Agrawal 
 
 # ======================= PROTOBUF ======================
+# Everything inside here should be self contained.
 
 # Protobuf dependencies
 RUN apt-get update && apt-get install -y \
+    python3 \
+    python3-dev \
+    python3-setuptools \
     autoconf \
     automake \
     libtool \
@@ -24,13 +16,11 @@ RUN apt-get update && apt-get install -y \
     make \
     g++ \
     unzip \
-    git \
-    && apt-get -y clean all \
-    && rm -rf /var/lib/apt/lists/*
+    git
 
-# Build and install protoc for python and C++
-RUN cd /tmp \
-    && git clone https://github.com/google/protobuf.git  \
+# Build and install protoc for python and C++, and clean up afterward.
+WORKDIR /tmp
+RUN git clone https://github.com/google/protobuf.git  \
     && cd protobuf  \
     && ./autogen.sh  \
     && ./configure --prefix=/usr  \
@@ -41,19 +31,32 @@ RUN cd /tmp \
     && cd python  \
     && python3 setup.py build  \
     && python3 setup.py test \
-    && python3 setup.py install --cpp_implementation
+    && python3 setup.py install --cpp_implementation \
+    && cd / \
+    && rm -r /tmp/*
+
+# ======================= TORNADO ======================
+
+# Install tornado.
+RUN apt-get update && apt-get install -y \
+    python3 \
+    python3-pip \
+    python3-setuptools
+RUN pip3 install tornado
 
 # ======================= OPENCV ======================
-# Borrowed from https://hub.docker.com/r/elenaalexandrovna/opencv-python3/
-
-RUN apt-get update && \
-    apt-get install -y \
+# Note that this doesn't install with the cuda toolkit. Oh well.
+RUN apt-get update && apt-get install -y \
     build-essential \
     cmake \
     git \
     wget \
     unzip \
+    ffmpeg \
+    libgtk-3-dev \
     pkg-config \
+    libavcodec-dev \
+    libavformat-dev \
     libswscale-dev \
     python3-dev \
     python3-numpy \
@@ -63,16 +66,19 @@ RUN apt-get update && \
     libpng-dev \
     libtiff-dev \
     libjasper-dev \
-    libavformat-dev \
-    && apt-get -y clean all \
-    && rm -rf /var/lib/apt/lists/*
+    libdc1394-22 \
+    libdc1394-22-dev
 
-WORKDIR /
-RUN wget https://github.com/Itseez/opencv/archive/3.0.0.zip \
-    && unzip 3.0.0.zip \
-    && mkdir /opencv-3.0.0/cmake_binary \
-    && cd /opencv-3.0.0/cmake_binary \
-    && cmake .. \
+WORKDIR /tmp
+RUN wget https://github.com/opencv/opencv/archive/3.1.0.zip \
+    && unzip 3.1.0.zip \
+    && cd opencv-3.1.0 \
+    && mkdir build \
+    && cd build \
+    && cmake -D CMAKE_BUILD_TYPE=RELEASE -D CMAKE_INSTALL_PREFIX=/usr \
+        -D BUILD_EXAMPLES=OFF \
+        .. \
+    && make -j8 \
     && make install \
-    && rm /3.0.0.zip \
-    && rm -r /opencv-3.0.0
+    && cd / \
+    && rm -r /tmp/
