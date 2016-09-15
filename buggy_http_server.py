@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import os
 import logging
 
@@ -95,3 +97,7 @@ class BuggyHttpServer(tornado.httpserver.HTTPServer):
         tornado.ioloop.PeriodicCallback(client.make_connection, 1000).start()
         client.listen()
         self.queue_test()
+
+if __name__ == "__main__":
+    BuggyHttpServer(0).listen(80)
+    tornado.ioloop.IOLoop.current().start()
