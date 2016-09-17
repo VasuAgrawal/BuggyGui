@@ -2,9 +2,9 @@
 // The Plotly backend uses SVG to render the graphics. This causes the page to
 // noticeably slow down every time the render happens, even if it's being rate
 // limited. Switching to either canvas.js or chart.js (preferred) is necessary.
-//initializeScatter("graph1");
-//initializeScatter("graph2");
-//initializeScatter("graph3");
+initializeScatter("graph1");
+initializeScatter("graph2");
+initializeScatter("graph3");
 
 // This has trouble performing more than 5Hz, so we rate limit it.
 function onImuMessage(message) {
@@ -46,7 +46,7 @@ function onImuMessage(message) {
 // This is just proof of concept for rate limiting code.
 // TODO(vasua): Figure out some way of making this rate limiting code apply to
 // all kinds of different types of Plotly plots?
-//MessageMaster.registerCallback("IMU", onImuMessage);
+MessageMaster.registerCallback("IMU", onImuMessage);
 
 makeCard("imu1", colCount = 4);
 var imu1 = new AngleViewer("imu1", 1, 1, 1, "Top Right View");

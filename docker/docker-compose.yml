@@ -1,29 +1,43 @@
 version: '2'
 services:
-    server1:
+    data_server_1:
+        build: .
+        ports:
+            - "4242"
+        volumes:
+            - "..:/buggy:ro"
+        entrypoint: "/buggy/buggy_data_server.py"
+
+    http_server_1:
         build: .
         ports: 
             - "80"
         volumes:
             - "..:/buggy:ro"
         entrypoint: "/buggy/buggy_http_server.py"
+        links:
+            - data_server_1 
 
-    server2:
+    http_server_2:
         build: .
         ports:
             - "80"
         volumes:
             - "..:/buggy:ro"
         entrypoint: "/buggy/buggy_http_server.py"
+        links:
+            - data_server_1 
 
     nginx:
         image: nginx
         ports:
             - "80:80"
             - "443:443"
+            - "4242:4242"
         links:
-            - server1
-            - server2
+            - data_server_1 
+            - http_server_1 
+            - http_server_2
         volumes:
             - "../nginx/nginx.conf:/etc/nginx/nginx.conf:ro"
             - "../static:/www/static"

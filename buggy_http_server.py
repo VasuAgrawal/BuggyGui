@@ -72,7 +72,7 @@ class BuggyHttpServer(tornado.httpserver.HTTPServer):
             # Serve the proto files we need, and only those ending in .proto
             (r"/protos/(.*proto$)", tornado.web.StaticFileHandler,
              {'path': os.path.join(os.path.dirname(__file__), "protos")})
-        ], debug=True, **settings)
+        ], xheaders=True, debug=True, **settings)
 
     @tornado.gen.coroutine
     def queue_test(self):
@@ -93,7 +93,8 @@ class BuggyHttpServer(tornado.httpserver.HTTPServer):
     def __init__(self, server_num, *args, **kwargs):
         self.server_num = server_num
         secret_key = "Server%d" % server_num
-        client = SubClient(secret_key, "Server", "%s" % server_num)
+        client = SubClient(secret_key, "Server", "%s" % server_num,
+                "data_server_1", 4242)
         tornado.ioloop.PeriodicCallback(client.make_connection, 1000).start()
         client.listen()
         self.queue_test()

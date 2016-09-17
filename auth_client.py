@@ -7,16 +7,16 @@ from protos.auth_pb2 import AuthMessage
 from packet import Packet
 
 class AuthClient(tornado.tcpclient.TCPClient):
-    HOST = "localhost"
-    PORT = 4242
-
-    def __init__(self, secret_key, team_name, buggy_name):
+    def __init__(self, secret_key, team_name, buggy_name, HOST = "localhost",
+            PORT = "4242"):
         super().__init__()
         self.stream = None
         self.stream_ok = False
         self.secret_key = secret_key
         self.team_name = team_name
         self.buggy_name = buggy_name
+        self.HOST = HOST
+        self.PORT = PORT
 
     async def make_auth_connection(self):
         """Tries to connect to the server to auth against it.
@@ -38,7 +38,8 @@ class AuthClient(tornado.tcpclient.TCPClient):
                 self.stream = yield self.connect(self.HOST, self.PORT)
                 yield self.make_auth_connection()
             except tornado.iostream.StreamClosedError as e:
-                logging.warning("%s [Hint: server may be down!]", e)
+                pass
+                # logging.warning("%s [Hint: server may be down!]", e)
         elif self.stream.closed():
             self.stream = None
             self.stream_ok = False

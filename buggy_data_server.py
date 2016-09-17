@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 """Class to receive and handle data from a buggy."""
 
 import numpy as np
@@ -99,3 +101,6 @@ class BuggyDataServer(tornado.tcpserver.TCPServer):
         else:
             self.handle_buggy(stream, address, buggy_info.secret_key)
 
+if __name__ == "__main__":
+    BuggyDataServer().listen(4242)
+    tornado.ioloop.IOLoop.current().start()

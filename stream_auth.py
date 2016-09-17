@@ -42,6 +42,10 @@ async def auth_stream(stream, address):
         return None
 
     # TODO(vasua): Better validation here.
+    if "Server" in auth_message.secret_key:
+        logging.info("Authentication attempt from Server successful!")
+        return auth_message
+
     if (auth_message.secret_key in valid_keys and
             auth_message.secret_key not in used_keys):
         # Eventually, we'll want to check that the team name is one of the teams
