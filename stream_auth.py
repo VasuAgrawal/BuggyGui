@@ -11,7 +11,6 @@ used_keys = set()
 # authentication request.
 with open(os.path.join(os.path.dirname(os.path.realpath(__file__)), "KEYS"), "r") as f:
     valid_keys.update([line.strip() for line in f.readlines()])
-print(valid_keys)
 
 
 # TODO(vasua): Put some cap on the read so that invalid connection attempts
@@ -24,9 +23,9 @@ async def auth_stream(stream, address):
     Returns an AuthMessage if the stream and header info is valid.
     If the stream isn't valid, the stream is closed before returning None.
     """
-    data = await Packet.get_packet_data_as_bytes_from_stream(stream)
-    auth_message = AuthMessage()
     try:
+        data = await Packet.get_packet_data_as_bytes_from_stream(stream)
+        auth_message = AuthMessage()
         # Throws an exception if the proto string is invalid.
         auth_message.ParseFromString(data)
 

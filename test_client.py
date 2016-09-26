@@ -21,6 +21,19 @@ parser.add_argument("--buggy-name", type=str, help="Which buggy name to use.",
                     default="Transistor")
 parser.add_argument("--team-name", type=str, help="Which team name to use.",
                     default="RoboBuggy")
+parser.add_argument("--hostname", type=str, help="Which hostname to use for the"
+        " data server connection.", default="localhost")
+parser.add_argument("--port", type=int,
+        help="Which port to use for the data server connection.",
+        default=4242)
+
+parser.add_argument('--gui', dest='gui', action='store_true')
+parser.add_argument('--no-gui', dest='gui', action='store_false')
+parser.set_defaults(gui=True)
+
+parser.add_argument('--webcam', dest='webcam', action='store_true')
+parser.add_argument('--no-webcam', dest='webcam', action='store_false')
+parser.set_defaults(webcam=False)
 
 words = """
 There is a theory which states that if ever anyone discovers exactly what the
@@ -30,19 +43,27 @@ states that this has already happened.
 """.split()
 
 
-class Client(AuthClient):
-    HOST = "localhost"
-    PORT = 4242
 
-    def __init__(self, team_name, buggy_name):
-        super().__init__("42", team_name, buggy_name)
-        try:
-            # Uncomment this to switch to generated colors
-            raise Exception()
-            self.camera = cv2.VideoCapture(0)
-        except:
+class Client(AuthClient):
+
+    def __init__(self, team_name, buggy_name, *args, **kwargs):
+        print("Initi called")
+        super().__init__("42", team_name, buggy_name, *args, **kwargs)
+        if not cl_args.webcam:
             self.camera = None
             self.image_color = np.zeros(3, np.uint8)
+        else:
+            try:
+                self.camera = cv2.VideoCapture(0)
+            except:
+                pass
+        # try:
+            # # Uncomment this to switch to generated colors
+            # raise Exception()
+            # self.camera = cv2.VideoCapture(0)
+        # except:
+            # self.camera = None
+            # self.image_color = np.zeros(3, np.uint8)
 
         # IMU initialization
         self.imu_start = time.time()
@@ -153,8 +174,9 @@ class Client(AuthClient):
         data.camera.image = cv2.imencode(".png", image)[1].tostring()
         self.make_timestamp(data.camera.time)
         data.data_type = DataMessage.CAMERA
-        cv2.imshow("TEST CLIENT", image)
-        cv2.waitKey(1)
+        if (cl_args.gui):
+            cv2.imshow("TEST CLIENT", image)
+            cv2.waitKey(1)
 
     def async_send_stream(self, gen_fn):
         async def send():
@@ -171,12 +193,13 @@ class Client(AuthClient):
 
 
 if __name__ == "__main__":
-    args = parser.parse_args()
-    print(args)
+    global cl_args
+    cl_args = parser.parse_args()
+    print(cl_args)
 
     # Setup the client
     logging.basicConfig(level=logging.DEBUG)
-    client = Client(args.team_name, args.buggy_name)
+    client = Client(cl_args.team_name, cl_args.buggy_name, cl_args.hostname, cl_args.port)
 
     # Every second, try to authenticate and establish a connection.
     tornado.ioloop.PeriodicCallback(client.make_connection, 1000).start()

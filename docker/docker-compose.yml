@@ -2,16 +2,12 @@ version: '2'
 services:
     data_server_1:
         build: .
-        ports:
-            - "4242"
         volumes:
             - "..:/buggy:ro"
         entrypoint: "/buggy/buggy_data_server.py"
 
     http_server_1:
         build: .
-        ports: 
-            - "80"
         volumes:
             - "..:/buggy:ro"
         entrypoint: "/buggy/buggy_http_server.py"
@@ -20,8 +16,6 @@ services:
 
     http_server_2:
         build: .
-        ports:
-            - "80"
         volumes:
             - "..:/buggy:ro"
         entrypoint: "/buggy/buggy_http_server.py"
@@ -42,3 +36,16 @@ services:
             - "../nginx/nginx.conf:/etc/nginx/nginx.conf:ro"
             - "../static:/www/static"
             - "../protos:/www/protos"
+
+    # This is effectively the same as running it on the host machine and host
+    # network rather than within the docker network. This is so that we can test
+    # to ensure that the tcp listening port works via the public interface
+    # rather than through the docker channels.
+    test_client:
+        build: .
+        network_mode: "host"
+        volumes:
+            - "..:/buggy:ro"
+        entrypoint:
+            - "/buggy/test_client.py"
+            - "--no-gui"
