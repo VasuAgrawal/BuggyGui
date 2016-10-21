@@ -183,6 +183,7 @@ class Client(AuthClient):
             if self.stream_ok:
                 try:
                     data = DataMessage()
+                    data.robot_name = cl_args.buggy_name
                     gen_fn(data)
                     await self.stream.write(Packet.make_packet_from_bytes(
                         data.SerializeToString()))

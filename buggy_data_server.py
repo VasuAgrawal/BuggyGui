@@ -5,7 +5,6 @@
 import numpy as np
 import cv2
 import logging
-import random
 import time
 import tornado
 import tornado.tcpserver
@@ -77,8 +76,6 @@ class BuggyDataServer(tornado.tcpserver.TCPServer):
                 data = DataMessage()
                 data.ParseFromString(data_message)
                 self.cameraStuff(data)
-                data.robot_name = random.choice(["Deep Mind", "Bender",
-                    "Gearman"])
                 data_message = data.SerializeToString()
 
                 for server in self.httpservers:
