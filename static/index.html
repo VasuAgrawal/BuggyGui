@@ -1,74 +1,127 @@
 <html>
-    <head>
-        <title>GUI MDL</title>
-        <meta charset="utf-8" />
-        <!--<link rel="stylesheet" href="{{ static_url("mdl/material.min.css")}}">-->
-        <link rel="stylesheet" href="https://code.getmdl.io/1.2.0/material.red-orange.min.css" />
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="A front-end template that helps you build fast, modern mobile web apps.">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+    <title>Material Design Lite</title>
 
-    </head>
-    <body>
+    <!-- Add to homescreen for Chrome on Android -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <link rel="icon" sizes="192x192" href="images/android-desktop.png">
 
-        <!-- Always shows a header, even in smaller screens. -->
-        <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
-            <header class="mdl-layout__header">
-                <div class="mdl-layout__header-row">
-                <!-- Title -->
-                <span class="mdl-layout-title">Buggy 2016</span>
-                <!-- Add spacer, to align navigation to the right -->
-                <div class="mdl-layout-spacer"></div>
-                <nav class="mdl-navigation">
-                    <a class="mdl-navigation__link" href="">Link 1</a>
-                    <a class="mdl-navigation__link" href="">Link 2</a>
-                    <a class="mdl-navigation__link" href="">Link 3</a>
-                    <a class="mdl-navigation__link" href="">Link 4</a>
-                </nav>
-                </div>
-            </header>
+    <!-- Add to homescreen for Safari on iOS -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="Material Design Lite">
+    <link rel="apple-touch-icon-precomposed" href="images/ios-desktop.png">
 
-            <main class="mdl-layout__content mdl-color--grey-100">
-                <div class="page-content">
-                    <div class="mdl-grid">
-                        <div id="statuses"></div>
-                        <div id="graph1"></div>
-                        <div id="graph2"></div>
-                        <div id="graph3"></div>
-                        <div id="graph4"></div>
+    <!-- Tile icon for Win8 (144x144 + tile color) -->
+    <meta name="msapplication-TileImage" content="images/touch/ms-touch-icon-144x144-precomposed.png">
+    <meta name="msapplication-TileColor" content="#3372DF">
 
-                        <div id="imu1"></div>
-                        <div id="imu2"></div>
-                        <div id="imu3"></div>
+    <link rel="shortcut icon" href="{{ static_url("images/favicon.png")}}">
 
-                        <div id="statusbar"></div>
-                        <div id="camera"></div>
-                        <div id="camera2"></div>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://code.getmdl.io/1.2.1/material.red-orange.min.css">
+    <link rel="stylesheet" href="{{ static_url("css/styles.css")}}">
+  </head>
 
-                        <div id="asdf"></div>
-                    </div>
-                </div>
-            </main>
+  <body>
+
+    <!-- Always shows a header, even in smaller screens. -->
+    <div class="demo-layout mdl-layout mdl-js-layout mdl-layout--fixed-drawer mdl-layout--fixed-header">
+      <header class="mdl-layout__header">
+        <div class="mdl-layout__header-row">
+          <!-- Title -->
+          <span class="mdl-layout-title">Buggy 2016</span>
+          <!-- Add spacer, to align navigation to the right -->
+          <div class="mdl-layout-spacer"></div>
+          <nav class="mdl-navigation">
+            <a class="mdl-navigation__link" href="">Link 1</a>
+            <a class="mdl-navigation__link" href="">Link 2</a>
+            <a class="mdl-navigation__link" href="">Link 3</a>
+            <a class="mdl-navigation__link" href="">Link 4</a>
+          </nav>
         </div>
-        <!--TODO(vasua): Switch everything over to a CDN.-->
-        <script src="https://maps.googleapis.com/maps/api/js"></script>
-        <script src="{{ static_url("mdl/material.min.js")}}"></script>
-        <script src="{{ static_url("js/third_party/plotly-latest.min.js")}}"></script>
-        <script src="{{ static_url("js/widgetUtils.js")}}"></script>
+      </header>
 
-        <script src="{{ static_url("js/third_party/long.js")}}"></script>
-        <script src="{{ static_url("js/third_party/bytebuffer.js")}}"></script>
-        <script src="{{ static_url("js/third_party/protobuf.js")}}"></script>
-        <script src="{{ static_url("js/messageMaster.js")}}"></script>
+      <div class="demo-drawer mdl-layout__drawer mdl-color--blue-grey-900 mdl-color-text--blue-grey-50">
+        
+        <header class="demo-drawer-header">
+          <img src="{{ static_url("images/user.jpg")}}" class="demo-avatar">
+          <div class="demo-avatar-dropdown">
+            <span>hello@example.com</span>
+            <div class="mdl-layout-spacer"></div>
+            <button id="accbtn" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+              <i class="material-icons" role="presentation">arrow_drop_down</i>
+              <span class="visuallyhidden">Accounts</span>
+            </button>
+            <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="accbtn">
+              <li class="mdl-menu__item">hello@example.com</li>
+              <li class="mdl-menu__item">info@example.com</li>
+              <li class="mdl-menu__item"><i class="material-icons">add</i>Add another account...</li>
+            </ul>
+          </div>
+        </header>
 
-        <script src="{{ static_url("js/third_party/three.min.js")}}"></script>
-        <script src="{{ static_url("js/third_party/d3.v3.min.js")}}"></script>
-        <script src="{{ static_url("js/oscar.js")}}"></script>
-        <script src="{{ static_url("js/imuHandler.js")}}"></script>
+        <nav class="demo-navigation mdl-navigation mdl-color--blue-grey-800">
+          <a class="mdl-navigation__link"><i class="mdl-color-text--blue-grey-400 material-icons" role="">android</i>Robot Enabled</a>
 
-        <script src="{{ static_url("js/statusHandler.js")}}"></script>
-        <script src="{{ static_url("js/gpsHandler.js")}}"></script>
-        <script src="{{ static_url("js/encoderHandler.js")}}"></script>
-        <script src="{{ static_url("js/cameraHandler.js")}}"></script>
+          <div id="robot_names"></div>
+        </nav>
 
-        <script src="{{ static_url("js/third_party/reconnecting-websocket.js")}}"></script>
-        <script src="{{ static_url("js/ws.js")}}"></script>
-    </body>
+      </div>
+
+      <main class="mdl-layout__content mdl-color--grey-100">
+      <div class="page-content">
+        <div class="mdl-grid">
+          <div id="statuses"></div>
+          <!--<div id="graph1"></div>-->
+          <!--<div id="graph2"></div>-->
+          <!--<div id="graph3"></div>-->
+          <!--<div id="graph4"></div>-->
+
+          <div id="imu1"></div>
+          <div id="imu2"></div>
+          <div id="imu3"></div>
+
+          <div id="statusbar"></div>
+          <div id="camera"></div>
+          <div id="camera2"></div>
+
+          <div id="asdf"></div>
+        </div>
+      </div>
+      </main>
+    </div>
+
+    <!--TODO(vasua): Switch everything over to a CDN.-->
+    <script src="https://maps.googleapis.com/maps/api/js"></script>
+    <script src="https://code.getmdl.io/1.2.1/material.min.js"></script>
+
+    <script src="{{ static_url("js/third_party/plotly-latest.min.js")}}"></script>
+    <script src="{{ static_url("js/widgetUtils.js")}}"></script>
+
+    <script src="{{ static_url("js/third_party/long.js")}}"></script>
+    <script src="{{ static_url("js/third_party/bytebuffer.js")}}"></script>
+    <script src="{{ static_url("js/third_party/protobuf.js")}}"></script>
+    <script src="{{ static_url("js/navbarUtils.js")}}"></script>
+    <script src="{{ static_url("js/messageMaster.js")}}"></script>
+
+    <script src="{{ static_url("js/third_party/three.min.js")}}"></script>
+    <script src="{{ static_url("js/third_party/d3.v3.min.js")}}"></script>
+    <script src="{{ static_url("js/oscar.js")}}"></script>
+    <script src="{{ static_url("js/imuHandler.js")}}"></script>
+
+    <script src="{{ static_url("js/statusHandler.js")}}"></script>
+    <script src="{{ static_url("js/gpsHandler.js")}}"></script>
+    <script src="{{ static_url("js/encoderHandler.js")}}"></script>
+    <script src="{{ static_url("js/cameraHandler.js")}}"></script>
+
+    <script src="{{ static_url("js/third_party/reconnecting-websocket.js")}}"></script>
+    <script src="{{ static_url("js/ws.js")}}"></script>
+
+  </body>
 </html>

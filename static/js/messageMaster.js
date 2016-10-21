@@ -4,31 +4,36 @@
 
 // TODO(vasua): Figure out how to asynchronously load the proto.
 // TODO(vasua): Generalize this.
-var MessageMaster = {};
-// Everything is a public variable!
-MessageMaster.builder = dcodeIO.ProtoBuf.loadProtoFile(location.origin + 
-        "/protos/message.proto");
-MessageMaster.dataMessage = MessageMaster.builder.build("DataMessage");
-MessageMaster.dataType = MessageMaster.builder.lookup("DataMessage.DataType");
-MessageMaster.callbacks = {};
 
-MessageMaster.clearCallbacks = function() {
-    for (var value of MessageMaster.dataType.children) {
-        MessageMaster.callbacks[value.id] = [];
+function MessageMasterServer() {
+    this.builder = dcodeIO.ProtoBuf.loadProtoFile(location.origin + 
+            "/protos/message.proto");
+    this.dataMessage = this.builder.build("DataMessage");
+    this.dataType = this.builder.lookup("DataMessage.DataType");
+    this.callbacks = {};
+}
+
+MessageMasterServer.prototype.clearCallbacks = function() {
+    for (var value of this.dataType.children) {
+        this.callbacks[value.id] = [];
     }
 }
-MessageMaster.clearCallbacks();
 
-MessageMaster.registerCallback = function(callbackType, callback) {
-    MessageMaster.callbacks[MessageMaster.dataType.getChild(callbackType).id].push(callback);
+MessageMasterServer.prototype.registerCallback = function(callbackType, callback) {
+    this.callbacks[this.dataType.getChild(callbackType).id].push(callback);
 }
 
-MessageMaster.handleMessage = function(event) {
-    var dataMessage = MessageMaster.dataMessage.decode(event.data);
+MessageMasterServer.prototype.handleMessage = function(event) {
+    var dataMessage = this.dataMessage.decode(event.data);
     var message = dataMessage.get(dataMessage.data);
     var dataType = dataMessage.data_type;
-
-    for (var fn of MessageMaster.callbacks[dataType]) {
-        fn(message);
+    var robotName = dataMessage.robot_name;
+    if(RobotManager.addRobot(robotName)) {
+        for (var fn of this.callbacks[dataType]) {
+            fn(message);
+        }
     }
 }
+
+var MessageMaster = new MessageMasterServer();
+MessageMaster.clearCallbacks();

@@ -5,6 +5,7 @@
 import numpy as np
 import cv2
 import logging
+import random
 import time
 import tornado
 import tornado.tcpserver
@@ -76,15 +77,18 @@ class BuggyDataServer(tornado.tcpserver.TCPServer):
                 data = DataMessage()
                 data.ParseFromString(data_message)
                 self.cameraStuff(data)
+                data.robot_name = random.choice(["Deep Mind", "Bender",
+                    "Gearman"])
                 data_message = data.SerializeToString()
+
+                for server in self.httpservers:
+                    server.write(Packet.make_packet_from_bytes(data_message))
             except (tornado.iostream.StreamClosedError, AssertionError) as e:
                 # Make sure to return, otherwise we get stuck in an infinite
                 # loop here and the server dies.
                 stream_auth.reset_key(key)
                 return
 
-            for server in self.httpservers:
-                server.write(Packet.make_packet_from_bytes(data_message))
 
     @tornado.gen.coroutine
     def handle_stream(self, stream, address):

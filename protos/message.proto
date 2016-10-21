@@ -74,4 +74,5 @@ message DataMessage {
         ImageMessage camera = 8;
     }
     DataType data_type = 7;
+    string robot_name = 9;
 }
