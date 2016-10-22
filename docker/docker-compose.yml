@@ -3,22 +3,22 @@ services:
     data_server_1:
         image: pythonado
         volumes:
-            - "..:/buggy:ro"
-        entrypoint: "/buggy/buggy_data_server.py"
+            - "..:/web_gui:rw"
+        entrypoint: "/web_gui/buggy_data_server.py"
 
     http_server_1:
         image: pythonado
         volumes:
-            - "..:/buggy:ro"
-        entrypoint: "/buggy/buggy_http_server.py"
+            - "..:/web_gui:ro"
+        entrypoint: "/web_gui/buggy_http_server.py"
         links:
             - data_server_1 
 
     http_server_2:
         image: pythonado
         volumes:
-            - "..:/buggy:ro"
-        entrypoint: "/buggy/buggy_http_server.py"
+            - "..:/web_gui:ro"
+        entrypoint: "/web_gui/buggy_http_server.py"
         links:
             - data_server_1 
 
@@ -45,10 +45,10 @@ services:
         image: pythonado
         network_mode: "host"
         volumes:
-            - "..:/buggy:ro"
+            - "..:/web_gui:ro"
         entrypoint:
-            - "/buggy/test_client.py"
-            - "--key=/buggy/keys/robot1.key"
+            - "/web_gui/test_client.py"
+            - "--key=/web_gui/keys/robot1.key"
             - "--no-gui"
             - "--status"
             - "--buggy-name=Deep Mind (Status)"
@@ -57,10 +57,10 @@ services:
         image: pythonado
         network_mode: "host"
         volumes:
-            - "..:/buggy:ro"
+            - "..:/web_gui:ro"
         entrypoint:
-            - "/buggy/test_client.py"
-            - "--key=/buggy/keys/robot2.key"
+            - "/web_gui/test_client.py"
+            - "--key=/web_gui/keys/robot2.key"
             - "--no-gui"
             - "--imu"
             - "--buggy-name=Bender (IMU)"
@@ -69,10 +69,10 @@ services:
         image: pythonado
         network_mode: "host"
         volumes:
-            - "..:/buggy:ro"
+            - "..:/web_gui:ro"
         entrypoint:
-            - "/buggy/test_client.py"
-            - "--key=/buggy/keys/robot3.key"
+            - "/web_gui/test_client.py"
+            - "--key=/web_gui/keys/robot3.key"
             - "--no-gui"
             - "--camera"
             - "--buggy-name=Megatron (Camera)"

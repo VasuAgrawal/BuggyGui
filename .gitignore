@@ -3,3 +3,4 @@ static_old/
 *.swp
 keys/
 static/js/third_party/Chart.min.js
+logs/

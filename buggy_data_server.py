@@ -4,7 +4,10 @@
 
 import numpy as np
 import cv2
+import math
+import os
 import logging
+import struct
 import time
 import tornado
 import tornado.tcpserver
@@ -24,6 +27,19 @@ class BuggyDataServer(tornado.tcpserver.TCPServer):
         self.keyframe_time = time.time()
         self.diff_time = 5  # seconds
         self.httpservers = set()
+
+        # Note that these files will be created with root ownership, not user.
+        # This is fine for the server case, and is a consequence of docker
+        # images running as the root user.
+        dirname = os.path.dirname(os.path.realpath(__file__))
+        self.log_filename = os.path.join(dirname, "logs", str(math.floor(time.time())))
+        os.makedirs(os.path.dirname(self.log_filename), exist_ok=True)
+        os.chmod(os.path.dirname(self.log_filename), 0o755)
+
+        with open(self.log_filename, "wb+"):
+            pass
+
+        os.chmod(self.log_filename, 0o644)
 
         super().__init__(*args, **kwargs)
 
@@ -77,6 +93,9 @@ class BuggyDataServer(tornado.tcpserver.TCPServer):
                 data.ParseFromString(data_message)
                 self.cameraStuff(data)
                 data_message = data.SerializeToString()
+                with open(self.log_filename, "ab+") as out:
+                    length = struct.pack("!I", len(data_message))
+                    out.write(length + data_message)
 
                 for server in self.httpservers:
                     server.write(Packet.make_packet_from_bytes(data_message))
