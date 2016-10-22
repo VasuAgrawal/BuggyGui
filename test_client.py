@@ -4,6 +4,7 @@ import argparse
 import logging
 import math
 import random
+import sys
 import time
 
 import cv2
@@ -26,6 +27,9 @@ parser.add_argument("--hostname", type=str, help="Which hostname to use for the"
 parser.add_argument("--port", type=int,
         help="Which port to use for the data server connection.",
         default=4242)
+parser.add_argument("--key", type=str,
+        help="Path to key to use for authentication to the server.",
+        default="")
 
 parser.add_argument('--gui', dest='gui', action='store_true')
 parser.add_argument('--no-gui', dest='gui', action='store_false')
@@ -34,6 +38,18 @@ parser.set_defaults(gui=True)
 parser.add_argument('--webcam', dest='webcam', action='store_true')
 parser.add_argument('--no-webcam', dest='webcam', action='store_false')
 parser.set_defaults(webcam=False)
+parser.add_argument('--camera', dest='camera', action='store_true')
+parser.add_argument('--no-camera', dest='camera', action='store_false')
+parser.set_defaults(camera=False)
+parser.add_argument('--imu', dest='imu', action='store_true')
+parser.add_argument('--no-imu', dest='imu', action='store_false')
+parser.set_defaults(imu=False)
+parser.add_argument('--gps', dest='gps', action='store_true')
+parser.add_argument('--no-gps', dest='gps', action='store_false')
+parser.set_defaults(gps=False)
+parser.add_argument('--status', dest='status', action='store_true')
+parser.add_argument('--no-status', dest='status', action='store_false')
+parser.set_defaults(status=False)
 
 words = """
 There is a theory which states that if ever anyone discovers exactly what the
@@ -46,9 +62,8 @@ states that this has already happened.
 
 class Client(AuthClient):
 
-    def __init__(self, team_name, buggy_name, *args, **kwargs):
-        print("Initi called")
-        super().__init__("42", team_name, buggy_name, *args, **kwargs)
+    def __init__(self, key, team_name, buggy_name, *args, **kwargs):
+        super().__init__(key, team_name, buggy_name, *args, **kwargs)
         if not cl_args.webcam:
             self.camera = None
             self.image_color = np.zeros(3, np.uint8)
@@ -188,30 +203,43 @@ class Client(AuthClient):
                     await self.stream.write(Packet.make_packet_from_bytes(
                         data.SerializeToString()))
                 except tornado.iostream.StreamClosedError as e:
-                    logging.warning(
-                        "%s, unable to send message. [Hint: server may be down!]", e)
+                    pass
+                    # logging.warning(
+                        # "%s, unable to send message. [Hint: server may be down!]", e)
         return send
 
 
 if __name__ == "__main__":
     global cl_args
     cl_args = parser.parse_args()
-    print(cl_args)
+    logging.warning(cl_args)
 
     # Setup the client
     logging.basicConfig(level=logging.DEBUG)
-    client = Client(cl_args.team_name, cl_args.buggy_name, cl_args.hostname, cl_args.port)
+    if (cl_args.key):
+        with open(cl_args.key) as key_file:
+            key = key_file.read().strip()
+            client = Client(key, cl_args.team_name, cl_args.buggy_name,
+                    cl_args.hostname, cl_args.port)
 
-    # Every second, try to authenticate and establish a connection.
-    tornado.ioloop.PeriodicCallback(client.make_connection, 1000).start()
-    # Periodically send various types of messages
-    tornado.ioloop.PeriodicCallback(client.async_send_stream(
-        client.make_status_data), 5).start()  # 200 hz
-    tornado.ioloop.PeriodicCallback(client.async_send_stream(
-        client.make_imu_data), 20).start()  # 50 hz
-    tornado.ioloop.PeriodicCallback(client.async_send_stream(
-        client.make_gps_data), 500).start()  # 1 hz
-    tornado.ioloop.PeriodicCallback(client.async_send_stream(
-        client.make_camera_data), 50).start()  # 30 hz
+        # Every second, try to authenticate and establish a connection.
+        tornado.ioloop.PeriodicCallback(client.make_connection, 1000).start()
+        # Periodically send various types of messages
+        if cl_args.status:
+            tornado.ioloop.PeriodicCallback(client.async_send_stream(
+                client.make_status_data), 5).start()  # 200 hz
+        if cl_args.imu:
+            tornado.ioloop.PeriodicCallback(client.async_send_stream(
+                client.make_imu_data), 20).start()  # 50 hz
+        if cl_args.gps:
+            tornado.ioloop.PeriodicCallback(client.async_send_stream(
+                client.make_gps_data), 500).start()  # 1 hz
+        if cl_args.camera:
+            tornado.ioloop.PeriodicCallback(client.async_send_stream(
+                client.make_camera_data), 50).start()  # 30 hz
+
+    else:
+        logging.error("Key is invalid! Quitting program.")
+        sys.exit(1)
 
     tornado.ioloop.IOLoop.instance().start()

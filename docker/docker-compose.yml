@@ -1,13 +1,13 @@
 version: '2'
 services:
     data_server_1:
-        build: .
+        image: pythonado
         volumes:
             - "..:/buggy:ro"
         entrypoint: "/buggy/buggy_data_server.py"
 
     http_server_1:
-        build: .
+        image: pythonado
         volumes:
             - "..:/buggy:ro"
         entrypoint: "/buggy/buggy_http_server.py"
@@ -15,7 +15,7 @@ services:
             - data_server_1 
 
     http_server_2:
-        build: .
+        image: pythonado
         volumes:
             - "..:/buggy:ro"
         entrypoint: "/buggy/buggy_http_server.py"
@@ -42,10 +42,37 @@ services:
     # to ensure that the tcp listening port works via the public interface
     # rather than through the docker channels.
     test_client:
-        build: .
+        image: pythonado
         network_mode: "host"
         volumes:
             - "..:/buggy:ro"
         entrypoint:
             - "/buggy/test_client.py"
+            - "--key=/buggy/keys/robot1.key"
             - "--no-gui"
+            - "--status"
+            - "--buggy-name=Deep Mind (Status)"
+    
+    test_client_2:
+        image: pythonado
+        network_mode: "host"
+        volumes:
+            - "..:/buggy:ro"
+        entrypoint:
+            - "/buggy/test_client.py"
+            - "--key=/buggy/keys/robot2.key"
+            - "--no-gui"
+            - "--imu"
+            - "--buggy-name=Bender (IMU)"
+    
+    test_client_3:
+        image: pythonado
+        network_mode: "host"
+        volumes:
+            - "..:/buggy:ro"
+        entrypoint:
+            - "/buggy/test_client.py"
+            - "--key=/buggy/keys/robot3.key"
+            - "--no-gui"
+            - "--camera"
+            - "--buggy-name=Megatron (Camera)"

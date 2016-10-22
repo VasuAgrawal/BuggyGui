@@ -9,9 +9,12 @@ valid_keys = set()
 used_keys = set()
 # TODO(vasua): Replace this with a DB lookup every time there's an
 # authentication request.
-with open(os.path.join(os.path.dirname(os.path.realpath(__file__)), "KEYS"), "r") as f:
-    valid_keys.update([line.strip() for line in f.readlines()])
 
+for root, dirnames, fnames in os.walk(os.path.join(
+    os.path.dirname(os.path.realpath(__file__)), "keys")):
+    for fname in fnames:
+        with open(os.path.join(root, fname), "r") as f:
+            valid_keys.update([line.strip() for line in f.readlines()])
 
 # TODO(vasua): Put some cap on the read so that invalid connection attempts
 # don't block the entire system.

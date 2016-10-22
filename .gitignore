@@ -1,5 +1,5 @@
 __pycache__/
 static_old/
 *.swp
-KEYS
+keys/
 static/js/third_party/Chart.min.js

@@ -35,12 +35,15 @@ $ docker -v
 $ docker-compose -v
 ```
 
-Once the Docker engine is installed, you can run the system. The first time you
-run the following command, it'll take some time to build as the server image
-builds to roughly 1.3 GB (which needs to be improved). After the first time you
-build it, it shouldn't need to build again. Each of the docker images mounts the
-repo as a read-only directory, so any updates to code will be visible on a
-restart.
+Finally, you need to do one more thing: build the server image. This will take
+some time as it needs to build a 1.3GB image. After the first time you build it,
+it shouldn't need to build again. Each of the docker images mounts the repo as a
+read-only directory, so any updates to the code will be visible on a restart.
+
+```
+$ cd docker
+$ docker build . --tag pythonado
+```
 
 Basic Usage
 ------
