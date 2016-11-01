@@ -1,42 +1,5 @@
 version: '2'
 services:
-    data_server_1:
-        image: pythonado
-        volumes:
-            - "..:/web_gui:rw"
-        entrypoint: "/web_gui/buggy_data_server.py"
-
-    http_server_1:
-        image: pythonado
-        volumes:
-            - "..:/web_gui:ro"
-        entrypoint: "/web_gui/buggy_http_server.py"
-        links:
-            - data_server_1 
-
-    http_server_2:
-        image: pythonado
-        volumes:
-            - "..:/web_gui:ro"
-        entrypoint: "/web_gui/buggy_http_server.py"
-        links:
-            - data_server_1 
-
-    nginx:
-        image: nginx
-        ports:
-            - "80:80"
-            - "443:443"
-            - "4242:4242"
-        links:
-            - data_server_1 
-            - http_server_1 
-            - http_server_2
-        volumes:
-            - "../nginx/nginx.conf:/etc/nginx/nginx.conf:ro"
-            - "../static:/www/static"
-            - "../protos:/www/protos"
-
     # This is effectively the same as running it on the host machine and host
     # network rather than within the docker network. This is so that we can test
     # to ensure that the tcp listening port works via the public interface
@@ -45,7 +8,7 @@ services:
         image: pythonado
         network_mode: "host"
         volumes:
-            - "..:/web_gui:ro"
+            - "../..:/web_gui:ro"
         entrypoint:
             - "/web_gui/test_client.py"
             - "--key=/web_gui/keys/robot1.key"
@@ -57,7 +20,7 @@ services:
         image: pythonado
         network_mode: "host"
         volumes:
-            - "..:/web_gui:ro"
+            - "../..:/web_gui:ro"
         entrypoint:
             - "/web_gui/test_client.py"
             - "--key=/web_gui/keys/robot2.key"
@@ -69,10 +32,22 @@ services:
         image: pythonado
         network_mode: "host"
         volumes:
-            - "..:/web_gui:ro"
+            - "../..:/web_gui:ro"
         entrypoint:
             - "/web_gui/test_client.py"
             - "--key=/web_gui/keys/robot3.key"
             - "--no-gui"
             - "--camera"
             - "--buggy-name=Megatron (Camera)"
+    
+    test_client_4:
+        image: pythonado
+        network_mode: "host"
+        volumes:
+            - "../..:/web_gui:ro"
+        entrypoint:
+            - "/web_gui/test_client.py"
+            - "--key=/web_gui/keys/robot4.key"
+            - "--no-gui"
+            - "--gps"
+            - "--buggy-name=Marvin (GPS)"
