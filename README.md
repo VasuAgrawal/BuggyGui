@@ -25,8 +25,8 @@ dependencies by doing the following the appropriate
 
 You'll then need to install Docker compose. Depending on your OS, this may or
 may not be necessary, as in some cases it's included with the Docker
-installation above. If you need to install it separately, (see this link)
-[https://docs.docker.com/compose/install/].
+installation above. If you need to install it separately, [see this link]
+( https://docs.docker.com/compose/install/ ).
 
 After both items are installed, you should be able to run the following:
 
@@ -47,21 +47,37 @@ $ docker build . --tag pythonado
 
 Basic Usage
 ------
-The server and Nginx can be started with a single line (from within the `docker`
-folder). You can kill it all with CTRL+C.
+The server can be started on a computer using the following command, and can be
+killed with CTRL+C.
 
 ```
-$ cd docker
-$ docker-compose up
+$ docker-compose -f docker/server/docker-compose.yml up
 ```
 
-From a [separate terminal](https://tmux.github.io/), you can then run
-`test_client.py`. This spawns a fake buggy that automatically generates data to
-send to the server. The test client requires dependencies to be installed on
-your local machine, see `README_STANDALONE.md`.
+You can then run the Test Client from a [separate terminal]
+(https://tmux.github.io/), in a similar manner to the above. It can also be
+killed with CTRL+C. Note that you don't need to install dependencies on your
+computer anymore.
 
 ```
-$ ./test_client.py
+$ docker-compose -f docker/client/docker-compose.yml up
+```
+
+Various arguments can be passed into the Test Client to force it to connect to a
+remote server, to turn on sensors, etc. Execute the following to get more
+information on how to trigger the various sensors. You shouldn't need to have
+any of the dependencies installed on your local machine to do this. You can also
+do it from a Docker container if you so desire.
+
+```
+$ ./test_client.py --help
 ```
 
 You can then navigate to [`http://localhost`](http://localhost) to see it.
+
+FAQ
+------
+
+* Make sure that your Docker and docker-compose versions match! The stock docker
+  installed in Ubuntu 14.04 isn't new enough. You'll likely need to install both
+  of them from source.

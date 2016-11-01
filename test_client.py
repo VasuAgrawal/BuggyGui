@@ -1,21 +1,5 @@
 #!/usr/bin/env python3
-
 import argparse
-import logging
-import math
-import random
-import sys
-import time
-
-import cv2
-import numpy as np
-import tornado
-from auth_client import AuthClient
-from protos.message_pb2 import DataMessage
-from protos.message_pb2 import ImuMessage
-from protos.message_pb2 import GpsMessage
-from protos.message_pb2 import LogMessage
-from packet import Packet
 
 parser = argparse.ArgumentParser(description="Test client for Buggy Server.")
 parser.add_argument("--buggy-name", type=str, help="Which buggy name to use.",
@@ -50,6 +34,22 @@ parser.set_defaults(gps=False)
 parser.add_argument('--status', dest='status', action='store_true')
 parser.add_argument('--no-status', dest='status', action='store_false')
 parser.set_defaults(status=False)
+
+import logging
+import math
+import random
+import sys
+import time
+
+import cv2
+import numpy as np
+import tornado
+from auth_client import AuthClient
+from protos.message_pb2 import DataMessage
+from protos.message_pb2 import ImuMessage
+from protos.message_pb2 import GpsMessage
+from protos.message_pb2 import LogMessage
+from packet import Packet
 
 words = """
 There is a theory which states that if ever anyone discovers exactly what the
