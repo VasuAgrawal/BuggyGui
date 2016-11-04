@@ -89,6 +89,7 @@ class BuggyDataServer(tornado.tcpserver.TCPServer):
             try:
                 data_message = (
                     yield Packet.get_packet_data_as_bytes_from_stream(stream))
+                logging.debug("Got data from the buggy!")
                 data = DataMessage()
                 data.ParseFromString(data_message)
                 self.cameraStuff(data)
@@ -122,5 +123,6 @@ class BuggyDataServer(tornado.tcpserver.TCPServer):
             self.handle_buggy(stream, address, buggy_info.secret_key)
 
 if __name__ == "__main__":
+    logging.getLogger().setLevel(logging.INFO)
     BuggyDataServer().listen(4242)
     tornado.ioloop.IOLoop.current().start()

@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='auth.proto',
   package='',
   syntax='proto3',
-  serialized_pb=_b('\n\nauth.proto\"H\n\x0b\x41uthMessage\x12\x12\n\nsecret_key\x18\x01 \x01(\t\x12\x11\n\tteam_name\x18\x02 \x01(\t\x12\x12\n\nbuggy_name\x18\x03 \x01(\tb\x06proto3')
+  serialized_pb=_b('\n\nauth.proto\"\\\n\x0b\x41uthMessage\x12\x12\n\nsecret_key\x18\x01 \x01(\t\x12\x11\n\tteam_name\x18\x02 \x01(\t\x12\x12\n\nbuggy_name\x18\x03 \x01(\t\x12\x12\n\nrobot_name\x18\x04 \x01(\tb\x06proto3')
 )
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
@@ -54,6 +54,13 @@ _AUTHMESSAGE = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
+    _descriptor.FieldDescriptor(
+      name='robot_name', full_name='AuthMessage.robot_name', index=3,
+      number=4, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
   ],
   extensions=[
   ],
@@ -67,7 +74,7 @@ _AUTHMESSAGE = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=14,
-  serialized_end=86,
+  serialized_end=106,
 )
 
 DESCRIPTOR.message_types_by_name['AuthMessage'] = _AUTHMESSAGE

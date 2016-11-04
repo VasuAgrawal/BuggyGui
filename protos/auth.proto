@@ -4,4 +4,5 @@ message AuthMessage {
     string secret_key = 1;    
     string team_name = 2;
     string buggy_name = 3;
+    string robot_name = 4;
 }

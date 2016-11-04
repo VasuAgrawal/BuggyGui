@@ -4,3 +4,4 @@ static_old/
 keys/
 static/js/third_party/Chart.min.js
 logs/
+*.pyc

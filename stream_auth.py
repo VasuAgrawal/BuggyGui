@@ -34,10 +34,12 @@ async def auth_stream(stream, address):
 
         if not auth_message.secret_key:
             raise AttributeError("Missing secret key!")
-        if not auth_message.team_name:
-            raise AttributeError("Missing team name!")
-        if not auth_message.buggy_name:
-            raise AttributeError("Missing buggy name!")
+        # if not auth_message.robot_name:
+            # raise AttributeError("Missing robot name!")
+        # if not auth_message.team_name:
+            # raise AttributeError("Missing team name!")
+        # if not auth_message.buggy_name:
+            # raise AttributeError("Missing buggy name!")
     except Exception as e:
         logging.warning("Bad auth attempt from %s. Error: %s", address, e)
         stream.close()
