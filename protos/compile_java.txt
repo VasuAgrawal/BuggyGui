@@ -1,0 +1,9 @@
+Use protoc to compile with the following options from this directory:
+
+protoc --java_out=$DST_DIR message.proto
+
+DST_DIR is the java source directory. In this case, it is:
+
+real_time/surface_src/java_src/BuggyRos/src/main/java
+
+This adds a BuggyMessages.java file to BuggyRos
