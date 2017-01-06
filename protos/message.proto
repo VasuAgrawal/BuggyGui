@@ -2,48 +2,17 @@ syntax = "proto3";
 
 import "google/protobuf/timestamp.proto";
 
-option java_package = "com.roboclub.robobuggy.ros";
-option java_outer_classname = "BuggyMessages";
-
-message DeviceIDMessage {
+message ImuMessage {
     google.protobuf.Timestamp time = 1;
-    int32 id = 2;
+    double roll = 2;
+    double pitch = 3;
+    double yaw = 4;
 }
 
-message FingerprintMessage {
+message GpsMessage {
     google.protobuf.Timestamp time = 1;
-    int32 fpHash = 2;
-}
-
-message NodeStateMessage {
-    // Combined NodeStatusMessage and StateMessage
-    google.protobuf.Timestamp time = 1;
-    string node_name = 2;
-    string node_state = 3;
-    string node_status = 4;
-}
-
-message BatteryLevelMessage {
-    google.protobuf.Timestamp time = 1;
-    int32 level = 2;
-}
-
-message AutonStateMessage {
-    google.protobuf.Timestamp time = 1;
-    int32 state = 2;
-}
-
-message BrakeMessage {
-    // Used for brake state and brake command
-    // Removed AutonBrakeState and TeleopBrakeState, there's already a brake state and auton vs. teleop
-    google.protobuf.Timestamp time = 1;
-    bool down = 2;
-}
-
-message SteeringMessage {
-    // Used for wheel angle command and measurement
-    google.protobuf.Timestamp time = 1;
-    double angle = 2;
+    double lat = 2;
+    double long = 3;
 }
 
 message EncoderMessage {
@@ -53,35 +22,9 @@ message EncoderMessage {
     double acceleration = 4;
 }
 
-message GpsMessage {
+message WheelAngleCommandedMessage {
     google.protobuf.Timestamp time = 1;
-    double lat = 2;
-    double long = 3;
-    double heading = 4;
-}
-
-message ImuMessage {
-    google.protobuf.Timestamp time = 1;
-    double roll = 2;
-    double pitch = 3;
-    double yaw = 4;
-    double x_accel = 5;
-    double y_accel = 6;
-    double z_accel = 7;
-    double compass_heading = 8;
-}
-
-message ImageMessage {
-    // This might contain delta or keyframes
-    enum FrameType {
-        KEYFRAME = 0;
-        DELTA = 1;
-    }
-    google.protobuf.Timestamp time = 1;
-    int32 width = 2;
-    int32 height = 3;
-    bytes image = 4;
-    FrameType frame_type = 5;
+    double angle = 2;
 }
 
 message LogMessage {
@@ -97,46 +40,39 @@ message LogMessage {
     LogLevel log_level = 3;
 }
 
-message ResetMessage {
+message ImageMessage {
+    // This might contain delta or keyframes
+    enum FrameType {
+        KEYFRAME = 0;
+        DELTA = 1;
+    }
     google.protobuf.Timestamp time = 1;
+    int32 width = 2;
+    int32 height = 3;
+    bytes image = 4;
+    FrameType frame_type = 5;
 }
 
 message DataMessage {
     enum DataType {
         TEST = 0; // Ignore this message
-        DEVICE_ID = 1;
-        FINGERPRINT = 2;
-        NODE_STATE = 3;
-        BATTERY_LEVEL = 4;
-        AUTON_STATE = 5;
-        BRAKE_COMMAND = 6;
-        BRAKE_STATE = 7;
-        STEERING_COMMAND = 8;
-        STEERING_MEASUREMENT = 9;
-        ENCODER = 10;
-        GPS = 11;
-        IMU = 12;
-        CAMERA = 13;
-        STATUS = 14;
-        RESET = 15;
+        IMU = 1;
+        GPS = 2;
+        ENCODER = 3;
+        COMMAND_ANGLE = 4;
+        ACTUAL_ANGLE = 5;
+        STATUS = 6;
+        CAMERA = 7;
     }
     oneof data {
-        DeviceIDMessage device_id = 1;
-        FingerprintMessage fingerprint = 2;
-        NodeStateMessage node_state = 3;
-        BatteryLevelMessage battery_level = 4;
-        AutonStateMessage auton_state = 5;
-        BrakeMessage brake_command = 6;
-        BrakeMessage brake_state = 7;
-        SteeringMessage steering_command = 8;
-        SteeringMessage steering_measurement = 9;
-        EncoderMessage encoder = 10;
-        GpsMessage gps = 11;
-        ImuMessage imu = 12;
-        ImageMessage camera = 13;
-        LogMessage status = 14;
-        ResetMessage reset = 15;
+        ImuMessage imu = 1;
+        GpsMessage gps = 2;
+        EncoderMessage enc = 3;
+        WheelAngleCommandedMessage command_angle = 4;
+        WheelAngleCommandedMessage actual_angle = 5;
+        LogMessage status = 6;
+        ImageMessage camera = 8;
     }
-    DataType data_type = 16;
-    string robot_name = 17;
+    DataType data_type = 7;
+    string robot_name = 9;
 }
